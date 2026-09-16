@@ -16,12 +16,19 @@ const fs = require('fs');
 const zlib = require('zlib');
 const { createCanvas, loadImage } = require('canvas');
 const { exportValidMcpack } = require('./lib/mcpack-spec');
-const { buildLangs, PACK_TITLES } = require('./lib/mcpack-i18n');
+const { buildLangs, PACK_TITLES, HERITAGE_TITLES } = require('./lib/mcpack-i18n');
 
 const root = path.resolve(__dirname, '..');
 const packDir = path.resolve(root, process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'pack');
 const outDir = path.resolve(root, 'dist');
 const PACK_NAME = 'VOXEL CYBER-STREET Pack';
+
+// optional overrides for themed packs:  node tools/export-mcpack.js <packDir> --out NAME.mcpack --title "Title"
+function argVal(flag) {
+  const i = process.argv.indexOf(flag);
+  return i !== -1 ? process.argv[i + 1] : undefined;
+}
+const OUT_NAME = argVal('--out') || 'VOXEL-CYBER-STREET.mcpack';
 
 fs.mkdirSync(outDir, { recursive: true });
 if (!fs.existsSync(path.join(packDir, 'pack.json'))) {
@@ -66,7 +73,8 @@ const skinsJson = {
   })),
 };
 // ---------------- localization (en_US, de_DE, fr_FR, ja_JP — shared builder)
-const langBodies = buildLangs({ locName: LOC_NAME, packTitles: PACK_TITLES, skins: skinsMeta });
+const isHeritage = manifest.theme === 'heritage';
+const langBodies = buildLangs({ locName: LOC_NAME, packTitles: isHeritage ? HERITAGE_TITLES : PACK_TITLES, skins: skinsMeta });
 
 // ---------------- pack_icon.png (128x128 from skin #1, upscaled nearest)
 async function makeIcon() {
@@ -170,7 +178,7 @@ function buildZip(files) {
   files.push({ name: 'pack_icon.png', data: await makeIcon() });
 
   // write + validate the written bytes against the Microsoft spec (throws on deviation)
-  const out = path.join(outDir, 'VOXEL-CYBER-STREET.mcpack');
+  const out = path.join(outDir, OUT_NAME);
   exportValidMcpack(buildZip(files), out, { locName: LOC_NAME });
   console.log(`Wrote ${out} (${(fs.statSync(out).size / 1024).toFixed(1)} KB, ${files.length} entries)`);
   console.log('Skins:', manifest.skins.length, '| manifest uuid:', headerUuid);

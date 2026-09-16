@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL // NEON HERITAGE PACK — 36 Skin Gallery</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1f2023; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#cfd3d9; }
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:34px; z-index:20;
+    display:flex; align-items:center; gap:10px; padding:0 14px;
+    background:rgba(24,25,28,.92); border-bottom:1px solid #33353a;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8f949c;
+    white-space:nowrap;
+  }
+  .topbar b{ color:#e8ebee; letter-spacing:.18em; }
+  .dot{ width:7px;height:7px;border-radius:50%;background:#ff2d95;box-shadow:0 0 8px #ff2d95; }
+  .dot.c{ background:#19e3ff; box-shadow:0 0 8px #19e3ff; }
+  .topbar .spacer{ flex:1; }
+  .btn{
+    border:1px solid #4a4d55; background:#26282d; color:#dfe3e8; font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; cursor:pointer;
+    border-radius:2px; transition:all .15s;
+  }
+  .btn:hover{ background:#33363d; border-color:#5a5e67; }
+  .btn.primary{ border-color:#ff2d95; color:#ff9ccb; }
+  #wrap{ position:fixed; inset:34px 0 0 0; }
+  canvas{ display:block; }
+  .loader{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:#1f2023; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#8f949c;
+    transition:opacity .6s;
+  }
+  .loader.hide{ opacity:0; pointer-events:none; }
+  .loader .p{ color:#19e3ff; animation:pulse 1.2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.4} 50%{opacity:1} }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader"><span>GENERATING 36 SKINS&nbsp;</span><span class="p">▮▮▮</span></div>
+
+<div class="topbar">
+  <span class="dot"></span><span class="dot c"></span>
+  <b>VOXEL // NEON HERITAGE PACK</b>
+  <span>36 skins · scroll to browse</span>
+  <span class="spacer"></span>
+  <button class="btn" id="btnSpinAll">Spin All</button>
+  <button class="btn" id="btnCover">⬇ Cover</button>
+  <button class="btn" id="btnTrailer">● Trailer</button>
+  <button class="btn" id="btnSearch">🔍 Seed Search</button>
+  <button class="btn" id="btnPress">⬇ Press Kit</button>
+  <button class="btn" id="btnGuide">📖 Submission Guide</button>
+  <button class="btn" id="btnLang">🌐 Language QA</button>
+  <button class="btn" id="btnStore">🏪 Store Listing</button>
+  <button class="btn" id="btnLetter">✉ Cover Letter</button>
+  <button class="btn" id="btnCompliance">✅ Compliance</button>
+  <button class="btn" id="btnSheet">Reference Sheet</button>
+  <button class="btn primary" id="btnPack">⬇ All PNGs</button>
+</div>
+
+<div id="wrap"></div>
+
+<script src="skin-gen-core.js"></script>
+<script src="character-rig.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.35.3/build/index.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import * as POST_B from 'postprocessing';
+import { EffectComposer, RenderPass, EffectPass, BloomEffect } from 'postprocessing';
+/* ============================================================================
+   GALLERY — 36 characters, 4-column VERTICALLY SCROLLING grid.
+   One fixed renderer canvas; cells are scissored viewports translated by
+   -scrollY. Composers (bloom) are built lazily per visible cell with an
+   LRU cap, so GPU memory stays bounded while scrolling.
+   Pack layout mirrors tools/build-pack.js exactly:
+     accent = ACCENTS[i % 12], hair = HAIRS[i % 6], fit = FITS[i % 6],
+     seed = 2000+i, cape = true
+   ========================================================================== */
+const { createSkin, ACCENTS, HAIRS, FITS } = window.SkinGenCore;
+const N = 36;
+const THEME = 'heritage';                 // pack #2 staging preview
+const ACC = Object.keys(window.SkinGenCore.ACCENTS_HERITAGE);
+const HRS = Object.keys(window.SkinGenCore.HAIRS_HERITAGE);
+const FTS = window.SkinGenCore.FITS_HERITAGE;
+const PACK = [];
+for(let i=0;i<N;i++){
+  PACK.push({
+    theme:  THEME,
+    accent: ACC[i % ACC.length],
+    hair:   HRS[i % HRS.length],
+    fit:    FTS[i % FTS.length],
+    seed:   5000 + i,
+    cape:   true,
+  });
+}
+
+const wrap = document.getElementById('wrap');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1f2023);
+
+scene.add(new THREE.AmbientLight(0x8a93a5, 0.75));
+const key = new THREE.DirectionalLight(0xffffff, 1.25); key.position.set(60,90,80); scene.add(key);
+const rimC = new THREE.DirectionalLight(0x2dc98f, 0.5); rimC.position.set(-70,40,-60); scene.add(rimC);   // jade rim (heritage)
+const rimP = new THREE.DirectionalLight(0xff7e2d, 0.35); rimP.position.set(80,20,-50); scene.add(rimP);  // ember rim (heritage)
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+wrap.appendChild(renderer.domElement);
+
+const pedGeo = new THREE.CylinderGeometry(6.5, 7.5, 1.0, 32);
+const pedMat = new THREE.MeshLambertMaterial({ color:0x26282d });
+const ringGeo = new THREE.TorusGeometry(6.8, 0.16, 8, 48);
+function mkPedestal(){
+  const m = new THREE.Mesh(pedGeo, pedMat); m.position.y = -0.5;
+  const r1 = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color:0x19e3ff, transparent:true, opacity:0.8 }));
+  r1.rotation.x = Math.PI/2; r1.position.y = 0.15; m.add(r1);
+  return m;
+}
+
+// build all 36 characters (+ capes)
+const items = [];
+PACK.forEach((cfg, i)=>{
+  const { canvas, glowCanvas, capeCanvas, capeGlowCanvas, desc } = createSkin(cfg);
+  const tS = new THREE.CanvasTexture(canvas);
+  const tG = new THREE.CanvasTexture(glowCanvas);
+  const tC = new THREE.CanvasTexture(capeCanvas);
+  const tCG= new THREE.CanvasTexture(capeGlowCanvas);
+  for(const t of [tS,tG,tC,tCG]){ t.magFilter=THREE.NearestFilter; t.minFilter=THREE.NearestFilter; t.generateMipmaps=false; t.colorSpace=THREE.SRGBColorSpace; }
+  const rig = window.CharacterRig.createCharacter(THREE, tS, tG, { texCape:tC, texCapeGlow:tCG });
+  rig.setCape(true);
+  const ped = mkPedestal();
+  scene.add(rig.root, ped);
+  rig.snapTo(['idle','wave','walk','dance'][i % 4]);
+  rig.state.t = i * 0.7;
+  items.push({ rig, ped, desc, cfg, index:i });
+});
+
+// download data URLs (skip for perf: build lazily on click)
+function skinDataURL(cfg){
+  const { canvas } = createSkin(cfg);
+  const c = document.createElement('canvas'); c.width=64; c.height=64;
+  c.getContext('2d').drawImage(canvas,0,0);
+  return c.toDataURL('image/png');
+}
+
+// ---------------- virtual scroll grid: 4 cols x 9 rows
+const COLS = 4, PAD = 10, TOPPAD = 6;
+let rects = [], VH = 0;
+function computeRects(w, h){
+  const cw = (w - PAD*(COLS+1)) / COLS;
+  const ch = Math.max(200, Math.min(260, cw*1.72));
+  const rows = Math.ceil(N / COLS);
+  rects = [];
+  for(let i=0;i<N;i++){
+    const r = Math.floor(i / COLS), c = i % COLS;
+    rects.push({ x: PAD + c*(cw+PAD), y: TOPPAD + r*(ch+PAD), w:cw, h:ch });
+  }
+  VH = TOPPAD + rows*(ch+PAD);
+}
+let scrollY = 0, scrollMax = 0;
+
+// ---------------- LRU composers for visible cells
+let comps = new Map(); // idx -> {comp?, cam, lastSeen} — comp is null in perf mode
+function ensureComposer(i, w, h){
+  let c = comps.get(i);
+  if(c){ c.lastSeen = frameCount; comps.delete(i); comps.set(i, c); }
+  else {
+    const r = rects[i];
+    const cam = new THREE.PerspectiveCamera(30, r.w/r.h, 0.1, 500);
+    cam.position.set(40, 33, 78); cam.lookAt(0, 17.8, 0);
+    c = { comp: null, cam, lastSeen: frameCount };
+    comps.set(i, c);
+  }
+  // bloom is heavy ( EffectPass shader compiles per new cell ) — build only in
+  // quality mode so trailer recording never stalls on composer construction
+  if (!c.comp && !perfMode) {
+    c.comp = new EffectComposer(renderer);
+    c.comp.addPass(new RenderPass(scene, c.cam));
+    c.comp.addPass(new EffectPass(c.cam, new BloomEffect({
+      blendFunction: POST_B.BlendFunction.ADD,
+      mipmapBlur: true,
+      luminanceThreshold: 0.35,
+      luminanceSmoothing: 0.3,
+      intensity: 2.0,
+      radius: 0.75,
+    })));
+  }
+  // evict stale
+  while(comps.size > 18){
+    let oldestKey = null, oldest = Infinity;
+    for(const [k,v] of comps){ if(v.lastSeen < oldest){ oldest = v.lastSeen; oldestKey = k; } }
+    if(oldestKey === null || oldest === undefined) break;
+    const oc = comps.get(oldestKey);
+    if (oc.comp && oc.comp.dispose) oc.comp.dispose();
+    comps.delete(oldestKey);
+  }
+  return c;
+}
+
+// labels overlay
+const overlay = document.createElement('canvas');
+const octx = overlay.getContext('2d', { willReadFrequently: true });
+wrap.appendChild(overlay);
+Object.assign(overlay.style, { position:'absolute', inset:'0', pointerEvents:'none' });
+function drawLabels(h){
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  octx.font = '9px Segoe UI, Arial';
+  rects.forEach((r,i)=>{
+    const y = r.y - scrollY;
+    if(y + r.h < 0 || y > h) return;
+    const d = items[i].desc;
+    octx.fillStyle = 'rgba(160,166,175,0.9)';
+    octx.fillText(`#${String(i+1).padStart(2,'0')} ${d.accent}`, r.x+6, y+14);
+    octx.fillStyle = 'rgba(120,126,136,0.85)';
+    octx.fillText(`${d.hair} · ${d.fit}`, r.x+6, y+26);
+  });
+  // scrollbar
+  if(scrollMax > 0){
+    const trackH = h - 20, tx = overlay.width - 7;
+    octx.fillStyle = 'rgba(70,74,82,0.5)';
+    octx.fillRect(tx, 10, 3, trackH);
+    const th = Math.max(30, trackH * (h / VH));
+    const ty = 10 + (trackH - th) * (scrollY / scrollMax);
+    octx.fillStyle = 'rgba(25,227,255,0.8)';
+    octx.fillRect(tx, ty, 3, th);
+  }
+}
+
+// scroll input: wheel + drag on empty space
+wrap.addEventListener('wheel', e=>{
+  scrollY = Math.max(0, Math.min(scrollMax, scrollY + e.deltaY));
+  e.preventDefault();
+}, { passive:false });
+let dragScroll = null;
+renderer.domElement.addEventListener('pointerdown', e=>{
+  const r = renderer.domElement.getBoundingClientRect();
+  dragScroll = { y0: e.clientY, s0: scrollY, x: e.clientX - r.left, y: e.clientY - r.top, moved:false };
+});
+window.addEventListener('pointermove', e=>{
+  if(dragScroll){
+    const dy = e.clientY - dragScroll.y0;
+    if(Math.abs(dy) > 4) dragScroll.moved = true;
+    scrollY = Math.max(0, Math.min(scrollMax, dragScroll.s0 - dy));
+  }
+  const r = renderer.domElement.getBoundingClientRect();
+  mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+});
+window.addEventListener('pointerup', e=>{
+  if(dragScroll && !dragScroll.moved && hoverIdx >= 0){
+    const d = items[hoverIdx].desc;
+    location.href = `index.html?accent=${d.accent}&hair=${d.hair}&fit=${d.fit}&seed=${d.seed}&cape=1&theme=${items[hoverIdx].cfg.theme || 'core'}`;
+  }
+  dragScroll = null;
+});
+
+const mouse = { x:-1, y:-1 };
+let hoverIdx = -1;
+
+// UI
+let spinAll = false;
+let perfMode = false;   // trailer recording: bloom off, fixed label repaint
+document.getElementById('btnSpinAll').addEventListener('click', e=>{
+  spinAll = !spinAll; e.target.classList.toggle('primary', spinAll);
+});
+document.getElementById('btnSheet').addEventListener('click', ()=> location.href='index.html');  // explicit .html (cleanUrls off)
+document.getElementById('btnCover').addEventListener('click', ()=> location.href='cover.html');  // explicit .html (cleanUrls off)
+document.getElementById('btnTrailer').addEventListener('click', ()=> location.href='gallery.html?trailer=1');
+document.getElementById('btnSearch').addEventListener('click', ()=> location.href='search.html');
+document.getElementById('btnPress').addEventListener('click', ()=> location.href='presskit.html');
+document.getElementById('btnGuide').addEventListener('click', ()=> location.href='guide.html');
+document.getElementById('btnLang').addEventListener('click', ()=> location.href='langqa.html');
+document.getElementById('btnStore').addEventListener('click', ()=> location.href='store-listing.html');
+document.getElementById('btnLetter').addEventListener('click', ()=> location.href='cover-letter.html');
+document.getElementById('btnCompliance').addEventListener('click', ()=> location.href='compliance.html');
+document.getElementById('btnPack').addEventListener('click', ()=>{
+  items.forEach((it, i)=>{
+    setTimeout(()=>{
+      const a = document.createElement('a');
+      a.download = `skin-${String(i+1).padStart(2,'0')}-${it.desc.accent}-${it.desc.fit}.png`;
+      a.href = skinDataURL(it.cfg); a.click();
+    }, i*180);
+  });
+});
+
+let frameCount = 0;
+function resize(){
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  overlay.width = w; overlay.height = h;
+  overlay.style.width = w+'px'; overlay.style.height = h+'px';
+  computeRects(w, h);
+  scrollMax = Math.max(0, VH - h);
+  scrollY = Math.min(scrollY, scrollMax);
+  drawLabels(h);
+}
+window.addEventListener('resize', resize);
+
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  window.__rafN = (window.__rafN || 0) + 1;
+  const rafT0 = performance.now();
+  const dt = Math.min(clock.getDelta(), 0.05);
+  frameCount++;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  hoverIdx = -1;
+  rects.forEach((r,i)=>{
+    const y = r.y - scrollY;
+    if(mouse.x>=r.x && mouse.x<=r.x+r.w && mouse.y>=y && mouse.y<=y+r.h) hoverIdx=i;
+  });
+
+  renderer.setScissorTest(false);
+  renderer.setClearColor(0x1f2023,1);
+  renderer.clear();
+  renderer.setScissorTest(true);
+  // per-cell culling: each cell's render pass draws ONLY its own character.
+  // (Every composer.render() walks the whole scene — without culling, 12 cells
+  // × 36 characters ≈ 400+ wasted draw calls per frame. This cut a 105ms frame
+  // to ~15ms, which is what makes trailer recording and smooth scrolling work.)
+  items.forEach(it => { it.rig.root.visible = false; it.ped.visible = false; });
+  rects.forEach((r,i)=>{
+    const yTop = r.y - scrollY;
+    if(yTop + r.h < 0 || yTop > h) return;           // off-screen
+    const vx = r.x, vy = h - yTop - r.h;
+    renderer.setViewport(vx, vy, r.w, r.h);
+    renderer.setScissor(vx, vy, r.w, r.h);
+    const it = items[i];
+    it.rig.root.visible = true;
+    it.ped.visible = true;
+    it.rig.tick(dt);
+    const t = clock.elapsedTime + it.index;
+    let yaw = Math.sin(t*0.3)*0.12;
+    if(spinAll || i===hoverIdx) yaw = t*(spinAll?0.5:0.9);
+    it.rig.root.rotation.y = yaw;
+    it.rig.root.position.y = (i===hoverIdx) ? 1.5 : 0;
+    const c = ensureComposer(i, r.w, r.h);
+    const zoom = (i===hoverIdx) ? 0.92 : 1.0;
+    c.cam.position.set(40*zoom, 33*zoom, 78*zoom);
+    c.cam.lookAt(0, 17.8, 0);
+    if (perfMode) { renderer.render(scene, c.cam); }   // trailer recording: skip bloom entirely
+    else c.comp.render();
+  });
+  renderer.setScissorTest(false);
+  if (!perfMode || (frameCount % 15) === 0) drawLabels(h);
+  window.__rafMs = (window.__rafMs || 0) + (performance.now() - rafT0);
+}
+
+resize();
+animate();
+document.getElementById('loader').classList.add('hide');
+
+// ---------------- trailer-mode controller (consumed by trailer-capture.js)
+window.__galleryCtl = {
+  getCanvas: () => renderer.domElement,
+  setScroll: f => { scrollY = Math.max(0, Math.min(scrollMax, f * scrollMax)); },
+  setSpinAll: v => { spinAll = !!v; },
+  setHover: i => { hoverIdx = (typeof i === 'number') ? i : -1; },
+  setPerf: v => { perfMode = !!v; },   // trailer recording: cheap render mode
+};
+dispatchEvent(new Event('__galleryReady'));
+</script>
+<script src="trailer-capture.js"></script>
+</body>
+</html>

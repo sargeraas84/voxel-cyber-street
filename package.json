@@ -23,6 +23,8 @@
     "runclient": "bash tools/fabric-mod/run-client.sh",
     "datapack": "node tools/build-datapack.js",
     "starter": "node tools/build-starter-pack.js",
+    "heritage": "node tools/build-pack.js pack-heritage --theme heritage",
+    "serve": "node tools/serve.js 8321",
     "validate": "node tools/validate-packs.js",
     "trailer": "node tools/build-pack.js && node tools/export-mcpack.js && node tools/sync-fabric-resources.js && node tools/gen-egg-texture.js && node tools/build-fabric-mod.js && bash tools/compile-fabric-mod.sh build && node tools/render-cover.js && node tools/render-icons.js && node tools/render-poster.js && node tools/build-starter-pack.js && node tools/build-langqa.js && node tools/build-datapack.js && node tools/record-trailer.js && node tools/export-trailer-formats.js && node tools/build-store-listing.js && node tools/build-cover-letter.js && node tools/build-compliance.js && node tools/build-submission-bundle.js"
   },

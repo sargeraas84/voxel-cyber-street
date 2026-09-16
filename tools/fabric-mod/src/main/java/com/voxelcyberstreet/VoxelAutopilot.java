@@ -71,8 +71,16 @@ public final class VoxelAutopilot implements ClientModInitializer {
             case WAIT_INGAME -> {
                 if (client.world != null && client.player != null) {
                     setPhase(Phase.BUILDING_SCENE);
-                } else if (ticksInPhase > 20 * 90) {
-                    fail("world never loaded (quick-play failed?)");
+                } else {
+                    // diagnostics: where is the client stuck?
+                    if (ticksInPhase % 100 == 0) {
+                        var s = client.currentScreen;
+                        log("still waiting — screen=" + (s == null ? "null" : s.getClass().getName())
+                                + " world=" + (client.world != null));
+                    }
+                    if (ticksInPhase > 20 * 90) {
+                        fail("world never loaded (quick-play failed?)");
+                    }
                 }
             }
             case BUILDING_SCENE -> {
@@ -80,7 +88,12 @@ public final class VoxelAutopilot implements ClientModInitializer {
                 if (ticksInPhase == SETTLE_TICKS) {
                     sendCommand(client, "gamemode creative");
                     sendCommand(client, "gamerule doDaylightCycle false");
+                    sendCommand(client, "gamerule doWeatherCycle false");
                     sendCommand(client, "time set midnight");
+                    sendCommand(client, "weather clear 1000000");
+                    // The director routes are authored for a scene anchored at
+                    // (0, 64, 0) — the crafted world's spawn point.
+                    sendCommand(client, "tp @s 0.5 64 0.5");
                 }
                 if (ticksInPhase == SETTLE_TICKS + 10) sendCommand(client, "function vcsdemo:scene");
                 if (ticksInPhase > SETTLE_TICKS + SCENE_TICKS) {

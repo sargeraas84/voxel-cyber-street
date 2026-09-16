@@ -17,16 +17,20 @@ java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaV
 
 // Unattended capture boot:
 //   gradle runClient -Pvcs.quickPlay=NeonDistrict -Pvcs.route=tour
-// → vanilla --quickPlaySingleplayer (no UI) + VoxelAutopilot JVM flag
-tasks.named('runClient', JavaExec) {
-    doFirst {
-        if (project.hasProperty('vcs.quickPlay')) {
-            def route = (project.findProperty('vcs.route') ?: 'tour').toString()
-            args "--quickPlaySingleplayer=${project.property('vcs.quickPlay')}"
-            jvmArgs "-Dvoxelcyberstreet.autopilot=${route}"
-            println "[VCS] autopilot armed: world='${project.property('vcs.quickPlay')}' route='${route}'"
+// Loom builds the runClient command itself, so the flags must be registered
+// on the run config at configuration time (a doFirst append never survives).
+if (project.hasProperty('vcs.quickPlay')) {
+    def route = (project.findProperty('vcs.route') ?: 'tour').toString()
+    loom {
+        runs {
+            client {
+                programArgs "--quickPlaySingleplayer", project.property('vcs.quickPlay').toString(),
+                            "--width", "1280", "--height", "720"   // fixed capture resolution
+                vmArgs "-Dvoxelcyberstreet.autopilot=${route}"
+            }
         }
     }
+    println "[VCS] autopilot armed: world='${project.property('vcs.quickPlay')}' route='${route}'"
 }
 
 tasks.register('printMcJar') {

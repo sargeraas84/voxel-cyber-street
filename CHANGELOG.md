@@ -3,6 +3,34 @@
 All notable changes to the pack, the Bedrock exports, the Fabric mod and the
 store tooling. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] — 2026-09-16
+
+### Pack #2 — NEON HERITAGE
+- Second themed skin line: 36 skins (10 ember/jade/brass accent pairs × 6 heritage
+  hair looks × 6 fits: haori-wrap, mandarin-jacket, silk-hood, obi-bomber,
+  dragon-ma1, qipao-hood), same procedural pipeline, seed base 5000.
+- `skin-gen-core.js` is now theme-aware (`THEMES`, behavior-alias map so heritage
+  garments keep hoods/drape/hem treatments); pack #1 renders byte-identical.
+- `npm run heritage` → `pack-heritage/`; `node tools/export-mcpack.js pack-heritage
+  --out VOXEL-NEON-HERITAGE.mcpack` → spec-validated Bedrock pack; fully localized
+  display names (EN/DE/FR/JA) via the shared i18n builder.
+- `heritage.html` — live 3D gallery for the new line (QA'd headless: loader hides,
+  zero console errors); served by the new `npm run serve` static server.
+- Pack added to `tools/validate-packs.js` and attached to every GitHub release.
+
+### Gameplay capture
+- `tools/craft-demo-world.js` — builds the NeonDistrict singleplayer save with a
+  real vanilla 1.21 server (pre-seeded datapack, scene built from console; fixed
+  two vanilla-only parse bugs in the datapack: unquoted name selector, `pink` →
+  `light_purple`).
+- `tools/record-demo.sh` — unattended `--quickPlaySingleplayer` boot with the
+  autopilot director (pre-seeds `onboardAccessibility:false`, fixed window).
+- Voxel director creates frame dirs before recording (first run's screenshots
+  silently failed on `NoSuchFileException`); encoder auto-detects the first frame
+  and defaults to real-time 20 fps.
+- `dist/voxel-cyber-street-gameplay-demo-tour.mp4` — 2:00 real-time 1440p capture
+  (2399 frames) of the in-game tour route.
+
 ## [2.1.0] — 2026-09-16
 
 ### Fabric mod

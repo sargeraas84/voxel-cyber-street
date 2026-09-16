@@ -44,7 +44,10 @@ jobs:
         run: npx puppeteer browsers install chrome
 
       - name: Build everything (skins → mcpacks → Fabric jar → trailer → MP4s → pages)
-        run: npm run trailer
+        run: |
+          npm run trailer
+          npm run heritage
+          node tools/export-mcpack.js pack-heritage --out VOXEL-NEON-HERITAGE.mcpack
         env:
           CI: 'true'
 
@@ -59,6 +62,7 @@ jobs:
           mkdir -p release
           cp dist/VOXEL-CYBER-STREET.mcpack release/
           cp dist/VOXEL-CYBER-STREET-STARTER.mcpack release/
+          cp dist/VOXEL-NEON-HERITAGE.mcpack release/
           cp dist/voxel-cyber-street-fabric-1.21.jar release/
           cp dist/voxel-cyber-street-fabric-src.zip release/
           cp dist/vcsdemo-neon-district.zip release/

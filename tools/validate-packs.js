@@ -14,6 +14,7 @@ const root = path.resolve(__dirname, '..');
 const PACKS = [
   { file: 'dist/VOXEL-CYBER-STREET.mcpack', locName: 'VoxelCyberStreet' },
   { file: 'dist/VOXEL-CYBER-STREET-STARTER.mcpack', locName: 'VoxelCyberStreetStarter' },
+  { file: 'dist/VOXEL-NEON-HERITAGE.mcpack', locName: 'VoxelNeonHeritage' },
 ];
 
 let failed = false;

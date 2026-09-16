@@ -151,14 +151,14 @@ fn('tick', [
   'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=1}] {"text":"[TOUR 1/6] Overview — follow the WHITE beacon up and look down the strip. That is the whole Neon District.","color":"white"}',
   'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=191}] {"text":"[TOUR 2/6] Street level — the CYAN beacon. Two Corrupted Skins wait ahead; check their masks.","color":"aqua"}',
   'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=381}] {"text":"[TOUR 3/6] Cape line — MAGENTA beacon. Look north along the pink edge strips: the glowing tech capes.","color":"light_purple"}',
-  'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=571}] {"text":"[TOUR 4/6] Close-up — PINK beacon. Land 3 blocks behind a Corrupted Skin and study the cape.","color":"pink"}',
+  'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=571}] {"text":"[TOUR 4/6] Close-up — PINK beacon. Land 3 blocks behind a Corrupted Skin and study the cape.","color":"light_purple"}',
   'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=761}] {"text":"[TOUR 5/6] The cast — LIGHT-BLUE beacon at the street end. Turn around for the group shot.","color":"blue"}',
   'execute if score #tour vcs_state matches 1 run tellraw @a[scores={vcs_tour=951}] {"text":"[TOUR 6/6] Capture it — /vshot orbit 12 for a turntable, /vshot burst 6 while flying. Loop restarts in a moment.","color":"yellow"}',
   // persistent actionbar wayfinder for the current stop window (160 ticks each)
   'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=2..190}] actionbar {"text":"① follow the WHITE beacon up","color":"white"}',
   'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=192..380}] actionbar {"text":"② CYAN beacon — street level","color":"aqua"}',
   'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=382..570}] actionbar {"text":"③ MAGENTA beacon — cape line","color":"light_purple"}',
-  'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=572..760}] actionbar {"text":"④ PINK beacon — cape close-up","color":"pink"}',
+  'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=572..760}] actionbar {"text":"④ PINK beacon — cape close-up","color":"light_purple"}',
   'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=762..950}] actionbar {"text":"⑤ LIGHT-BLUE beacon — the cast","color":"blue"}',
   'execute if score #tour vcs_state matches 1 run title @a[scores={vcs_tour=952..1149}] actionbar {"text":"⑥ /vshot orbit 12 · /vshot burst 6","color":"yellow"}',
 ]);
@@ -178,7 +178,7 @@ fn('tour_off', [
 // ================= cleanup =================
 fn('clear', [
   `fill ~-20 ${STREET_Y} ~-20 ~20 ${STREET_Y + 12} ~40 minecraft:air`,
-  'kill @e[type=minecraft:zombie_villager,name=cyber_*]',
+  'kill @e[type=minecraft:zombie_villager,name="cyber_"]',
   'kill @e[type=minecraft:zombie_villager]',
   'kill @e[type=minecraft:zombie]',
   'function vcsdemo:tour_off',

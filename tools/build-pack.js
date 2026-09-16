@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * build-pack.js — generates the cyber-street skin pack into ./pack/
- *   pack/skins/*.png  (36 skins + 36 capes, glow baked in at 85%)
- *   pack/pack.json    (manifest describing every variant)
- * Layout matches gallery.html exactly:
- *   accent = ACCENTS[i % 12], hair = HAIRS[i % 6], fit = FITS[i % 6], seed = 2000+i
+ * build-pack.js — generates a themed cyber-street skin pack:
+ *   <outDir>/skins/*.png  (36 skins + 36 capes, glow baked in at 85%)
+ *   <outDir>/pack.json    (manifest describing every variant)
+ * Layout matches gallery.html exactly (within a theme):
+ *   accent = <theme accents>[i % n], hair = [i % 6], fit = [i % 6], seed = seedBase+i
  *
- * Usage: node tools/build-pack.js [outDir=pack]
+ * Usage: node tools/build-pack.js [outDir=pack] [--theme core|heritage]
  */
 const path = require('path');
 const fs = require('fs');
@@ -14,7 +14,16 @@ const { createCanvas } = require('canvas');
 
 const root = path.resolve(__dirname, '..');
 const core = require(path.join(root, 'skin-gen-core.js'));
-const { ACCENTS, HAIRS, FITS } = core;
+
+// theme selection: --theme heritage (default: core — byte-identical pack #1)
+const themeArgIdx = process.argv.indexOf('--theme');
+const themeKey = themeArgIdx >= 0 ? process.argv[themeArgIdx + 1] : 'core';
+const theme = core.THEMES[themeKey];
+if (!theme) {
+  console.error('unknown theme: ' + themeKey + ' (valid: ' + Object.keys(core.THEMES).join(', ') + ')');
+  process.exit(1);
+}
+const { accents: ACCENTS, hairs: HAIRS, fits: FITS } = theme;
 
 const outDir = path.resolve(process.argv[2] || path.join(root, 'pack'));
 const skinsDir = path.join(outDir, 'skins');
@@ -29,11 +38,11 @@ for (let i = 0; i < N; i++) {
   const accent = Object.keys(ACCENTS)[i % Object.keys(ACCENTS).length];
   const hair   = Object.keys(HAIRS)[i % Object.keys(HAIRS).length];
   const fit    = FITS[i % FITS.length];
-  const seed   = 2000 + i;
+  const seed   = theme.seedBase + i;
   const name   = `skin-${String(i + 1).padStart(2, '0')}-${accent}-${hair}-${fit}`;
 
   const { canvas, glowCanvas, capeCanvas, capeGlowCanvas, desc } =
-    core.createSkin({ accent, hair, fit, seed, cape: true }, env);
+    core.createSkin({ theme: themeKey, accent, hair, fit, seed, cape: true }, env);
 
   // bake glow (85%) so the PNG reads in vanilla Minecraft
   const ctx = canvas.getContext('2d');
@@ -62,8 +71,9 @@ for (let i = 0; i < N; i++) {
 }
 
 const manifest = {
-  pack: 'VOXEL // CYBER-STREET',
-  version: '2.0.0',
+  pack: theme.packId,
+  theme: themeKey,
+  version: '2.1.0',
   generator: 'skin-gen-core.js (procedural, seed-stable)',
   size: '64x64 classic (base+overlay in one canvas) + 64x32 cape',
   count: entries.length,

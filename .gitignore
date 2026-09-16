@@ -1,6 +1,7 @@
 # generated pack artifacts
 dist/
 pack/
+pack-heritage/
 starter-pack/
 trailer/
 icons/
@@ -11,7 +12,7 @@ store-listing.html
 cover-letter.html
 compliance.html
 voxel-cyber-street-trailer.webm
-voxel-cyber-street-gameplay-demo.mp4
+voxel-cyber-street-gameplay-demo*.mp4
 
 # portable toolchain (CI bootstraps its own)
 .toolchain/

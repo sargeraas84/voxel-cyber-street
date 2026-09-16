@@ -1,5 +1,9 @@
 # VOXEL // CYBER-TEEN
 
+[![Release](https://github.com/sargeraas84/voxel-cyber-street/actions/workflows/release.yml/badge.svg)](https://github.com/sargeraas84/voxel-cyber-street/actions/workflows/release.yml)
+[![Latest release](https://img.shields.io/github/v/release/sargeraas84/voxel-cyber-street?include_prereleases&label=latest%20release)](https://github.com/sargeraas84/voxel-cyber-street/releases/latest)
+[![License](https://img.shields.io/badge/license-CC--BY--NC--4.0-blue)](LICENSE)
+
 A full-body 3D voxel character design of a stylish teenager in the Minecraft style — oversized futuristic cyberpunk streetwear, glowing neon **pink + cyan** accents, messy **white** hair, a **tech-wear mask** over the lower face, and **chunky high-top sneakers**. Built as a procedural, Minecraft-ready **64×64 skin (base + overlay)** plus a live **character reference sheet** (hero ¾, front, side, rear) rendered in Three.js on a dark grey studio background with flat dynamic lighting.
 
 ## Files
@@ -8,13 +12,14 @@ A full-body 3D voxel character design of a stylish teenager in the Minecraft sty
 |---|---|
 | `index.html` | Reference sheet: 4 viewports, real UnrealBloom neon, idle/walk/wave/dance animations, toggleable glowing tech cape |
 | `gallery.html` | 36-skin pack gallery — scrollable 4-column grid of live 3D characters with bloom |
+| `heritage.html` | Pack #2 gallery: NEON HERITAGE — same rig, ember/jade/brass palette, haori/mandarin/obi fits (`npm run heritage` regenerates) |
 | `cover.html` | Live Marketplace cover compositor (2048×1152) |
 | `cover/voxel-cyber-street-cover-2048x1152.png` | Rendered cover image (also via `npm run cover`) |
-| `skin-gen-core.js` | Shared procedural painter: 6 accent pairs × 4 hair looks × 4 fits, seed-stable |
+| `skin-gen-core.js` | Shared procedural painter, theme-aware: Neon Street (pink/cyan) + Neon Heritage (ember/jade/brass) tables, seed-stable |
 | `character-rig.js` | Shared Three.js voxel rig + animation state machine |
 | `tools/generate-skin.js` | CLI: one skin PNG with `--accent --hair --fit --seed` |
-| `tools/build-pack.js` | CLI: generates the 12-skin pack into `pack/` + `pack.json` |
-| `tools/export-mcpack.js` | CLI: zips `pack/` into a spec-validated Bedrock `.mcpack` (4 languages) |
+| `tools/build-pack.js` | CLI: generates the skin pack into `pack/` + `pack.json` (`pack-heritage --theme heritage` for pack #2) |
+| `tools/export-mcpack.js` | CLI: zips `pack/` into a spec-validated Bedrock `.mcpack` (4 languages; themed packs: `node tools/export-mcpack.js pack-heritage --out VOXEL-NEON-HERITAGE.mcpack`) |
 | `tools/lib/mcpack-spec.js` | Microsoft skin-pack spec validator (build fails on any deviation) |
 | `tools/lib/mcpack-i18n.js` | Shared localization: en_US / de_DE / fr_FR / ja_JP .lang builder |
 | `guide.html` | Step-by-step submission guide: press kit → Marketplace partner application |
@@ -22,7 +27,7 @@ A full-body 3D voxel character design of a stylish teenager in the Minecraft sty
 | `tools/render-icons.js` | CLI: 36× 512×512 store portrait icons + contact sheet |
 | `tools/render-poster.js` | CLI: A3 (3508×4961 @ 300dpi) trading-card poster, 3×2 stat cards |
 | `tools/build-fabric-mod.js` | CLI: Java Edition Fabric mod — applies skins + capes to NPCs |
-| `tools/validate-packs.js` | CLI: re-validate both dist `.mcpack`s against the Microsoft spec |
+| `tools/validate-packs.js` | CLI: re-validate all dist `.mcpack`s against the Microsoft spec (core, starter, heritage) |
 | `trailer-capture.js` | Gallery trailer mode: records `gallery.html?trailer=1` to webm |
 | `TRAILER.md` | Shot list, VO script, OBS recording guide |
 | `cyber-teen-skin.png` | Latest generated single skin |

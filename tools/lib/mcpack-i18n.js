@@ -52,13 +52,52 @@ const FIT_NAMES = {
   'bomber-hood': { en_US: 'bomber + hood',  de_DE: 'Bomber + Kapuze', fr_FR: 'bomber + capuche', ja_JP: 'ブルゾン+フード' },
 };
 
+// ---- NEON HERITAGE (pack #2) display names -------------------------------
+const HERITAGE_TITLES = {
+  en_US: 'VOXEL NEON HERITAGE Pack',
+  de_DE: 'VOXEL NEON HERITAGE Paket',
+  fr_FR: 'Pack VOXEL NEON HERITAGE',
+  ja_JP: 'VOXEL NEON HERITAGE パック',
+};
+
+const HERITAGE_ACCENT_NAMES = {
+  'ember-gold':   { en_US: 'ember / gold',     de_DE: 'Glut / Gold',        fr_FR: 'braise / or',        ja_JP: '残り火×ゴールド' },
+  'jade-brass':   { en_US: 'jade / brass',     de_DE: 'Jade / Messing',     fr_FR: 'jade / laiton',      ja_JP: '翡翠×真鍮' },
+  'rose-copper':  { en_US: 'rose / copper',    de_DE: 'Rose / Kupfer',      fr_FR: 'rose / cuivre',      ja_JP: 'ローズ×銅' },
+  'indigo-gold':  { en_US: 'indigo / gold',    de_DE: 'Indigo / Gold',      fr_FR: 'indigo / or',        ja_JP: '藍×ゴールド' },
+  'plum-ember':   { en_US: 'plum / ember',     de_DE: 'Pflaume / Glut',     fr_FR: 'prune / braise',     ja_JP: 'プラム×残り火' },
+  'teal-bronze':  { en_US: 'teal / bronze',    de_DE: 'Petrol / Bronze',    fr_FR: 'sarcelle / bronze',  ja_JP: 'ティール×ブロンズ' },
+  'saffron-rose': { en_US: 'saffron / rose',   de_DE: 'Safran / Rose',      fr_FR: 'safran / rose',      ja_JP: 'サフラン×ローズ' },
+  'moss-copper':  { en_US: 'moss / copper',    de_DE: 'Moos / Kupfer',      fr_FR: 'mousse / cuivre',    ja_JP: 'モス×銅' },
+  'dusk-orchid':  { en_US: 'dusk / orchid',    de_DE: 'Dämmerung / Orchidee', fr_FR: 'crépuscule / orchidée', ja_JP: '黄昏×蘭' },
+  'crimson-brass': { en_US: 'crimson / brass', de_DE: 'Purpur / Messing',   fr_FR: 'carmin / laiton',    ja_JP: 'クリムゾン×真鍮' },
+};
+
+const HERITAGE_HAIR_NAMES = {
+  'ink-black': { en_US: 'ink black',  de_DE: 'tuschschwarz',  fr_FR: 'noir encre',    ja_JP: '墨黒' },
+  'chestnut':  { en_US: 'chestnut',   de_DE: 'kastanie',      fr_FR: 'châtain',       ja_JP: '栗色' },
+  'silver-fox':{ en_US: 'silver fox', de_DE: 'silberfuchs',   fr_FR: 'renard argenté', ja_JP: 'シルバーフォックス' },
+  'auburn':    { en_US: 'auburn',     de_DE: 'rotbraun',      fr_FR: 'auburn',        ja_JP: '赤褐' },
+  'moon-grey': { en_US: 'moon grey',  de_DE: 'mondgrau',      fr_FR: 'gris lunaire',  ja_JP: '月光グレー' },
+  'espresso':  { en_US: 'espresso',   de_DE: 'espresso',      fr_FR: 'espresso',      ja_JP: 'エスプレッソ' },
+};
+
+const HERITAGE_FIT_NAMES = {
+  'haori-wrap':     { en_US: 'haori wrap',      de_DE: 'Haori-Mantel',      fr_FR: 'haori drapé',      ja_JP: '羽織ラップ' },
+  'mandarin-jacket':{ en_US: 'mandarin jacket', de_DE: 'Mandarinenjacke',   fr_FR: 'veste mandarine',  ja_JP: 'マンダリンジャケット' },
+  'silk-hood':      { en_US: 'silk hood',       de_DE: 'Seidenkapuze',      fr_FR: 'capuche de soie',  ja_JP: 'シルクフード' },
+  'obi-bomber':     { en_US: 'obi bomber',      de_DE: 'Obi-Bomber',        fr_FR: 'bomber obi',       ja_JP: '帯ブルゾン' },
+  'dragon-ma1':     { en_US: 'dragon MA-1',     de_DE: 'Drachen-MA-1',      fr_FR: 'MA-1 dragon',      ja_JP: 'ドラゴンMA-1' },
+  'qipao-hood':     { en_US: 'qipao + hood',    de_DE: 'Qipao + Kapuze',    fr_FR: 'qipao + capuche',  ja_JP: 'チャイナフード' },
+};
+
 const maskName = k => (ACCENT_NAMES[k] && ACCENT_NAMES[k].en_US) || k;
 
-/** Localized display name for one skin. */
+/** Localized display name for one skin (theme-aware). */
 function skinTitle(lang, desc) {
-  const acc = (ACCENT_NAMES[desc.accent] && ACCENT_NAMES[desc.accent][lang]) || desc.accent;
-  const hair = (HAIR_NAMES[desc.hair] && HAIR_NAMES[desc.hair][lang]) || desc.hair;
-  const fit = (FIT_NAMES[desc.fit] && FIT_NAMES[desc.fit][lang]) || desc.fit;
+  const acc = ((HERITAGE_ACCENT_NAMES[desc.accent] || ACCENT_NAMES[desc.accent]) || {})[lang] || desc.accent;
+  const hair = ((HERITAGE_HAIR_NAMES[desc.hair] || HAIR_NAMES[desc.hair]) || {})[lang] || desc.hair;
+  const fit = ((HERITAGE_FIT_NAMES[desc.fit] || FIT_NAMES[desc.fit]) || {})[lang] || desc.fit;
   if (lang === 'ja_JP') return `${acc}／${hair}／${fit}`;
   if (lang === 'de_DE') return `${acc} — ${hair}, ${fit}`;
   return `${acc} · ${hair} · ${fit}`;
@@ -81,4 +120,4 @@ function buildLangs({ locName, packTitles, skins }) {
   return out;
 }
 
-module.exports = { PACK_TITLES, STARTER_TITLES, ACCENT_NAMES, HAIR_NAMES, FIT_NAMES, skinTitle, buildLangs };
+module.exports = { PACK_TITLES, STARTER_TITLES, HERITAGE_TITLES, ACCENT_NAMES, HAIR_NAMES, FIT_NAMES, HERITAGE_ACCENT_NAMES, HERITAGE_HAIR_NAMES, HERITAGE_FIT_NAMES, skinTitle, buildLangs };

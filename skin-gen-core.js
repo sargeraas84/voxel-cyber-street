@@ -44,6 +44,54 @@ const HAIRS = {
 // 4 fits (torso/limb shell silhouettes in 3D; texture patterns differ)
 const FITS = ['bomber', 'longline', 'vest-hood', 'tech-hood', 'kimono-tech', 'bomber-hood'];
 
+// ============================================================================
+// PACK #2 — "NEON HERITAGE" (dusk palettes over traditional garment silks):
+// deep ember, jade, brass and rose tones with warm metallic counterparts.
+// Same geometry, different palette tables — pack #1's skins stay byte-identical.
+// ============================================================================
+const ACCENTS_HERITAGE = {
+  'ember-gold':    { a:'#e8552d', b:'#ffb02d', aLo:'#8f2c0f', bLo:'#9c6a0f' },
+  'jade-brass':    { a:'#2dc98f', b:'#d9a441', aLo:'#0f7f58', bLo:'#8f6a1c' },
+  'rose-copper':   { a:'#e85a7a', b:'#d97b41', aLo:'#8f2c40', bLo:'#8f4a1c' },
+  'indigo-gold':   { a:'#5a6cff', b:'#ffc85a', aLo:'#2c3a8f', bLo:'#9c7a0f' },
+  'plum-ember':    { a:'#a04dcc', b:'#ff7e2d', aLo:'#5c1c7c', bLo:'#9c4a0f' },
+  'teal-bronze':   { a:'#2db8a8', b:'#c98a4b', aLo:'#0f7c70', bLo:'#7c5224' },
+  'saffron-rose':  { a:'#ffb84d', b:'#e85a9c', aLo:'#9c6a0f', bLo:'#8f2c5c' },
+  'moss-copper':   { a:'#8fb84d', b:'#d97b41', aLo:'#5c7c1c', bLo:'#8f4a1c' },
+  'dusk-orchid':   { a:'#c25aff', b:'#ff9e5a', aLo:'#6e1c8f', bLo:'#9c5c1c' },
+  'crimson-brass': { a:'#e83a4a', b:'#d9a441', aLo:'#8f1220', bLo:'#8f6a1c' },
+};
+
+// heritage hair looks — ink-black, warm chestnut, silver-fox, deep auburn
+const HAIRS_HERITAGE = {
+  'ink-black':    { light:'#4a4a52', mid:'#2e2e36', dark:'#1c1c24', shade:'#101016' },
+  'chestnut':     { light:'#a86a3c', mid:'#7c4a28', dark:'#5c341c', shade:'#3c2010' },
+  'silver-fox':   { light:'#f2f2f2', mid:'#c9ccd4', dark:'#9296a2', shade:'#5c606c' },
+  'auburn':       { light:'#b85a3c', mid:'#8c3c24', dark:'#642818', shade:'#401808' },
+  'moon-grey':    { light:'#e8eaf0', mid:'#b8bccc', dark:'#888ea0', shade:'#585e70' },
+  'espresso':     { light:'#6a4a38', mid:'#4a3024', dark:'#302018', shade:'#1c120c' },
+};
+
+const FITS_HERITAGE = ['haori-wrap', 'mandarin-jacket', 'silk-hood', 'obi-bomber', 'dragon-ma1', 'qipao-hood'];
+
+// silhouette behaviors are keyed by fit; thematic fits alias to the core
+// behavior set so heritage garments keep hoods, drape and hem treatments
+const FIT_ALIASES = {
+  'haori-wrap':      'longline',
+  'mandarin-jacket': 'bomber',
+  'silk-hood':       'tech-hood',
+  'obi-bomber':      'bomber',
+  'dragon-ma1':      'bomber-hood',
+  'qipao-hood':      'vest-hood',
+};
+
+// pack themes: each theme supplies its own accent/hair/fit tables; seedBase
+// keeps the two packs' skin lists disjoint while staying seed-stable
+const THEMES = {
+  core:     { accents: ACCENTS,          hairs: HAIRS,          fits: FITS,          label: 'Neon Street',   packId: 'VOXEL // CYBER-STREET',  seedBase: 2000 },
+  heritage: { accents: ACCENTS_HERITAGE, hairs: HAIRS_HERITAGE, fits: FITS_HERITAGE, label: 'Neon Heritage', packId: 'VOXEL // NEON HERITAGE', seedBase: 5000 },
+};
+
 function mulberry32(seed){
   let s = seed >>> 0;
   return function(){
@@ -98,16 +146,22 @@ function createSkin(opts, env){
   const seed  = (opts.seed >>> 0) || ((Math.random()*1e9)|0);
   const rnd   = mulberry32(seed);
   const V     = () => rnd();
-  const accentKey = opts.accent && ACCENTS[opts.accent] ? opts.accent
-                    : Object.keys(ACCENTS)[Math.floor(rnd()*6)];
-  const hairKey   = opts.hair && HAIRS[opts.hair] ? opts.hair
-                    : Object.keys(HAIRS)[Math.floor(rnd()*4)];
-  const fitKey    = opts.fit && FITS.includes(opts.fit) ? opts.fit
-                    : FITS[Math.floor(rnd()*4)];
+  const theme  = THEMES[opts.theme] ? opts.theme : 'core';
+  const ACC    = THEMES[theme].accents, HRS = THEMES[theme].hairs, FTS = THEMES[theme].fits;
+  const accentKey = opts.accent && ACC[opts.accent] ? opts.accent
+                    : Object.keys(ACC)[Math.floor(rnd()*6)];
+  const hairKey   = opts.hair && HRS[opts.hair] ? opts.hair
+                    : Object.keys(HRS)[Math.floor(rnd()*4)];
+  const fitKey    = opts.fit && FTS.includes(opts.fit) ? opts.fit
+                    : FTS[Math.floor(rnd()*4)];
 
-  const A   = ACCENTS[accentKey].a,  B = ACCENTS[accentKey].b;
-  const aLo = ACCENTS[accentKey].aLo, bLo = ACCENTS[accentKey].bLo;
-  const HR  = HAIRS[hairKey];
+  // thematic fits keep distinct names but reuse the core silhouette behaviors
+  // (hoods, drape, hem stripes) through an alias map
+  const fb = FIT_ALIASES[fitKey] || fitKey;
+
+  const A   = ACC[accentKey].a,  B = ACC[accentKey].b;
+  const aLo = ACC[accentKey].aLo, bLo = ACC[accentKey].bLo;
+  const HR  = HRS[hairKey];
 
   const skin = mk(64,64), s = skin.getContext('2d');
   const glow = mk(64,64), g = glow.getContext('2d');
@@ -179,11 +233,11 @@ function createSkin(opts, env){
 
   // ---------------- BODY base per fit
   const Bd = UV.body.base;
-  const panelC = fitKey==='vest-hood' ? PAL.denimPan : PAL.jacketHi;
+  const panelC = fb==='vest-hood' ? PAL.denimPan : PAL.jacketHi;
   face(s,Bd.front,(x,y,w,h)=>{
     if(y>=h-2) return PAL.jacketLo;
     if(y===0)  return PAL.jacketHi;
-    if(fitKey==='longline' && y>=h-4) return PAL.jacketLo;      // long hem
+    if(fb==='longline' && y>=h-4) return PAL.jacketLo;      // long hem
     if(x===Math.floor((y-1)*0.9)) return PAL.denimMid;          // zipper
     if(y>=2&&y<=5&&x>=2&&x<=5) return panelC;
     const d=V(); return d<0.12?PAL.jacketLo:(d<0.9?PAL.jacket:PAL.jacketHi);
@@ -191,8 +245,8 @@ function createSkin(opts, env){
   face(s,Bd.back,(x,y,w,h)=>{
     if(y>=h-2) return PAL.jacketLo;
     if(y===0)  return PAL.jacketHi;
-    if(fitKey==='longline' && y>=h-4) return PAL.jacketLo;
-    if(fitKey==='tech-hood' && y>=3&&y<=6&&Math.abs(x-3.5)<(7-y)) return PAL.jacketHi;
+    if(fb==='longline' && y>=h-4) return PAL.jacketLo;
+    if(fb==='tech-hood' && y>=3&&y<=6&&Math.abs(x-3.5)<(7-y)) return PAL.jacketHi;
     const d=V(); return d<0.15?PAL.jacketLo:PAL.jacket;
   });
   face(s,Bd.right,(x,y,w,h)=> (y>=h-2)?PAL.jacketLo:PAL.jacket);
@@ -228,17 +282,17 @@ function createSkin(opts, env){
   const shellEdge = PAL.jacketLo;
   face(s,BO.front,(x,y,w,h)=>{
     if(x===0||x===7||y===0||y===h-1) return shellEdge;
-    if(fitKey==='vest-hood' && y>=4) return PAL.denimBase;      // vest: lower half = under-layer
-    if(fitKey==='longline' && y===h-2) return PAL.jacketHi;     // hem stripe
+    if(fb==='vest-hood' && y>=4) return PAL.denimBase;      // vest: lower half = under-layer
+    if(fb==='longline' && y===h-2) return PAL.jacketHi;     // hem stripe
     const d=V(); return d<0.1?PAL.jacketLo:(d<0.85?PAL.jacket:PAL.jacketHi);
   });
   face(s,BO.back,(x,y)=>{
     if(x===0||x===7||y===0||y===11) return shellEdge;
-    if(fitKey==='vest-hood' && y>=4) return PAL.denimBase;
+    if(fb==='vest-hood' && y>=4) return PAL.denimBase;
     const d=V(); return d<0.85?PAL.jacket:PAL.jacketHi;
   });
-  face(s,BO.right,(x,y)=> (x===0||y===0||y===11) ? shellEdge : (fitKey==='vest-hood'&&y>=4?PAL.denimBase:PAL.jacket));
-  face(s,BO.left, (x,y)=> (x===3||y===0||y===11) ? shellEdge : (fitKey==='vest-hood'&&y>=4?PAL.denimBase:PAL.jacket));
+  face(s,BO.right,(x,y)=> (x===0||y===0||y===11) ? shellEdge : (fb==='vest-hood'&&y>=4?PAL.denimBase:PAL.jacket));
+  face(s,BO.left, (x,y)=> (x===3||y===0||y===11) ? shellEdge : (fb==='vest-hood'&&y>=4?PAL.denimBase:PAL.jacket));
   face(s,BO.top,()=>PAL.jacketHi);
   face(s,BO.bottom,()=>PAL.jacketLo);
   // shell piping (front + back)
@@ -247,13 +301,13 @@ function createSkin(opts, env){
   face(g,BO.back, (x,y)=> (y===1&&x>0&&x<7) ? A : null);
   face(s,BO.back, (x,y)=> (y===1&&x>0&&x<7) ? aLo : null);
   // vest-hood: hood roll on hat back top
-  if(fitKey==='vest-hood' || fitKey==='tech-hood' || fitKey==='bomber-hood'){
+  if(fb==='vest-hood' || fb==='tech-hood' || fb==='bomber-hood'){
     face(s,HT.top,(x,y)=> (y<2||y>5) ? PAL.jacketHi : null);
     face(s,HT.back,(x,y)=> y<2 ? PAL.jacket : null);
   }
 
   // kimono-tech: crossing lapels + obi band
-  if(fitKey==='kimono-tech'){
+  if(fb==='kimono-tech'){
     face(s,Bd.front,(x,y)=>{
       if(y>=1&&y<=6&&Math.abs(x-(3.5+(y-1)*0.8))<0.9) return PAL.jacketHi;
       if(y>=1&&y<=6&&Math.abs(x-(3.5-(y-1)*0.8))<0.9) return PAL.jacketHi;
@@ -266,32 +320,32 @@ function createSkin(opts, env){
   }
 
   // ---------------- ARMS (sleeve length varies by fit)
-  const cuffRow = fitKey==='longline' ? 8 : 7;   // where the glow band sits
+  const cuffRow = fb==='longline' ? 8 : 7;   // where the glow band sits
   function paintArm(AB, AO){
-    const sleeveEnd = fitKey==='vest-hood' ? 7 : 8; // skin shows below vest sleeve
+    const sleeveEnd = fb==='vest-hood' ? 7 : 8; // skin shows below vest sleeve
     face(s,AB.front,(x,y,w,h)=>{
       if(y>sleeveEnd){ if(y===9) return PAL.maskMid; return PAL.maskDark; }
-      if(fitKey==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid; // exposed forearm
+      if(fb==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid; // exposed forearm
       if(y===0) return PAL.jacketHi;
       if(x===0) return PAL.jacketLo;
       const d=V(); return d<0.15?PAL.jacketLo:(d<0.9?PAL.jacket:PAL.jacketHi);
     });
     face(s,AB.back,(x,y,w,h)=>{
       if(y>sleeveEnd){ if(y===9) return PAL.maskMid; return PAL.maskDark; }
-      if(fitKey==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
+      if(fb==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
       if(y===0) return PAL.jacketHi;
       if(x===3) return PAL.jacketLo;
       const d=V(); return d<0.15?PAL.jacketLo:(d<0.9?PAL.jacket:PAL.jacketHi);
     });
     face(s,AB.right,(x,y,w,h)=>{
       if(y>sleeveEnd){ if(y===9) return PAL.maskMid; return PAL.maskDark; }
-      if(fitKey==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
+      if(fb==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
       if(y===0||x===0) return PAL.jacketLo;
       return PAL.jacket;
     });
     face(s,AB.left,(x,y,w,h)=>{
       if(y>sleeveEnd){ if(y===9) return PAL.maskMid; return PAL.maskDark; }
-      if(fitKey==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
+      if(fb==='vest-hood' && y>=6 && y<=sleeveEnd) return PAL.skinMid;
       if(y===0||x===3) return PAL.jacketLo;
       return PAL.jacket;
     });
@@ -414,6 +468,6 @@ function createSkin(opts, env){
   return { canvas:skin, glowCanvas:glow, capeCanvas, capeGlowCanvas:capeGlow, desc:{ accent:accentKey, hair:hairKey, fit:fitKey, seed, cape:!!opts.cape } };
 }
 
-root.SkinGenCore = { PAL, ACCENTS, HAIRS, FITS, UV, createSkin, mulberry32 };
+root.SkinGenCore = { PAL, ACCENTS, HAIRS, FITS, ACCENTS_HERITAGE, HAIRS_HERITAGE, FITS_HERITAGE, THEMES, FIT_ALIASES, UV, createSkin, mulberry32 };
 if (typeof module !== 'undefined' && module.exports) module.exports = root.SkinGenCore;
 })(typeof window !== 'undefined' ? window : globalThis);

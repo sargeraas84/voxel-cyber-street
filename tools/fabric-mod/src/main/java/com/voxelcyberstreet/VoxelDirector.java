@@ -136,6 +136,16 @@ public final class VoxelDirector {
             return false;
         }
         running = true; hideHud = hud; active = r; startTick = 0; shotCount = 0;
+        // ScreenshotRecorder does NOT create missing directories — the route
+        // subfolder must exist before the first frame is written.
+        try {
+            java.nio.file.Files.createDirectories(client.runDirectory.toPath()
+                    .resolve("screenshots/director/" + r.key()));
+        } catch (Exception e) {
+            client.inGameHud.getChatHud().addMessage(Text.literal("[VCS] cannot create frame dir: " + e));
+            running = false;
+            return false;
+        }
         client.options.hudHidden = hideHud;
         client.player.getAbilities().allowFlying = true;
         client.player.getAbilities().flying = true;
