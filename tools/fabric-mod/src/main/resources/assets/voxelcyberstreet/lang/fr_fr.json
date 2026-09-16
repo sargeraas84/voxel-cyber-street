@@ -1,0 +1,16 @@
+{
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg": "Œuf d'apparition Corrupted Skin",
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg.lore": "Villageois zombie cyber-ado",
+
+  "voxelcyberstreet.vconfig.show": "[VOXEL CYBER-STREET] Configuration — corruptionRate 1-in-%s, capes %s, glow %s, spawnEgg %s, hideEggNames %s, eggPoseMode %s (config/voxelcyberstreet.json — /vconfig reload)",
+  "voxelcyberstreet.vconfig.reloaded": "[VOXEL CYBER-STREET] Configuration rechargée depuis config/voxelcyberstreet.json",
+  "voxelcyberstreet.vconfig.set.rate": "[VOXEL CYBER-STREET] corruptionRate = %s",
+  "voxelcyberstreet.vconfig.set.bool": "[VOXEL CYBER-STREET] %s = %s (enregistré)",
+  "voxelcyberstreet.vconfig.unknown": "[VOXEL CYBER-STREET] champ inconnu %s. Champs : %s",
+
+  "voxelcyberstreet.director.routes": "[VOXEL CYBER-STREET] Parcours du réalisateur : %s",
+  "voxelcyberstreet.director.rolling": "[VOXEL CYBER-STREET] Réalisateur : tournage de « %s » — %s images → run/screenshots/director/<route>/ %s",
+  "voxelcyberstreet.director.stop": "[VOXEL CYBER-STREET] Réalisateur : coupe — %s (%s images). Encodage : npm run encode",
+  "voxelcyberstreet.director.progress": "[VOXEL CYBER-STREET] Réalisateur : %s — %s%%",
+  "voxelcyberstreet.director.unknown": "[VOXEL CYBER-STREET] parcours inconnu %s. Parcours : %s"
+}

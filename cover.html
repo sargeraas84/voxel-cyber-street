@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL // CYBER-STREET — Marketplace Cover Generator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1f2023; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#cfd3d9; }
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:34px; z-index:20;
+    display:flex; align-items:center; gap:10px; padding:0 14px;
+    background:rgba(24,25,28,.92); border-bottom:1px solid #33353a;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8f949c;
+    white-space:nowrap;
+  }
+  .topbar b{ color:#e8ebee; letter-spacing:.18em; }
+  .dot{ width:7px;height:7px;border-radius:50%;background:#ff2d95;box-shadow:0 0 8px #ff2d95; }
+  .dot.c{ background:#19e3ff; box-shadow:0 0 8px #19e3ff; }
+  .topbar .spacer{ flex:1; }
+  .btn{
+    border:1px solid #4a4d55; background:#26282d; color:#dfe3e8; font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; cursor:pointer;
+    border-radius:2px; transition:all .15s;
+  }
+  .btn:hover{ background:#33363d; border-color:#5a5e67; }
+  .btn.primary{ border-color:#ff2d95; color:#ff9ccb; }
+  #stage{ position:fixed; inset:34px 0 0 0; display:flex; align-items:center; justify-content:center; }
+  #frame{ position:relative; box-shadow:0 10px 60px rgba(0,0,0,.5); }
+  #frame canvas{ display:block; width:100%; height:100%; }
+  .loader{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:#1f2023; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#8f949c;
+    transition:opacity .6s;
+  }
+  .loader.hide{ opacity:0; pointer-events:none; }
+  .loader .p{ color:#19e3ff; animation:pulse 1.2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.4} 50%{opacity:1} }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader"><span>COMPOSING COVER&nbsp;</span><span class="p">▮▮▮</span></div>
+
+<div class="topbar">
+  <span class="dot"></span><span class="dot c"></span>
+  <b>COVER GENERATOR</b>
+  <span>2048 × 1152 PNG</span>
+  <span class="spacer"></span>
+  <button class="btn" id="btnGallery">Gallery</button>
+  <button class="btn primary" id="btnSave">⬇ Save cover PNG</button>
+</div>
+
+<div id="stage"><div id="frame"></div></div>
+
+<script src="skin-gen-core.js"></script>
+<script src="character-rig.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.35.3/build/index.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import * as POST_B from 'postprocessing';
+import { EffectComposer, RenderPass, EffectPass, BloomEffect } from 'postprocessing';
+/* ============================================================================
+   COVER GENERATOR — renders a Marketplace-style cover at 2048x1152:
+   large hero character + three supporting skins + typography (baked 2D pass).
+   The on-screen preview IS the final composition, scaled to fit.
+   ========================================================================== */
+const { createSkin, ACCENTS, HAIRS, FITS } = window.SkinGenCore;
+const W = 2048, H = 1152;
+
+// cast: hero + 3 supporting skins (varied accents/hair/fits, all with capes)
+const CAST = [
+  { accent:'pink-cyan',    hair:'white-messy', fit:'bomber',      seed:2000, cape:true, role:'hero' },
+  { accent:'cyan-pink',    hair:'ice-blue',    fit:'vest-hood',   seed:2006, cape:true, role:'l' },
+  { accent:'violet-pink',  hair:'platinum-pink', fit:'longline',  seed:2011, cape:true, role:'r1' },
+  { accent:'gold-cyan',    hair:'smoke-teal',  fit:'kimono-tech', seed:2017, cape:false, role:'r2' },
+];
+
+const frame = document.getElementById('frame');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x17181c);
+
+scene.add(new THREE.AmbientLight(0x8a93a5, 0.7));
+const key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(60,90,80); scene.add(key);
+const rimC = new THREE.DirectionalLight(0x19e3ff, 0.6); rimC.position.set(-70,40,-60); scene.add(rimC);
+const rimP = new THREE.DirectionalLight(0xff2d95, 0.45); rimP.position.set(80,20,-50); scene.add(rimP);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+frame.appendChild(renderer.domElement);
+
+// ground: subtle reflective-looking disc under the cast
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(420, 48),
+  new THREE.MeshLambertMaterial({ color:0x1b1c21 })
+);
+ground.rotation.x = -Math.PI/2; ground.position.y = -0.5;
+scene.add(ground);
+
+const rigs = [];
+CAST.forEach((cfg, i)=>{
+  const { canvas, glowCanvas, capeCanvas, capeGlowCanvas } = createSkin(cfg);
+  const tS = new THREE.CanvasTexture(canvas);
+  const tG = new THREE.CanvasTexture(glowCanvas);
+  const tC = new THREE.CanvasTexture(capeCanvas);
+  const tCG= new THREE.CanvasTexture(capeGlowCanvas);
+  for(const t of [tS,tG,tC,tCG]){ t.magFilter=THREE.NearestFilter; t.minFilter=THREE.NearestFilter; t.generateMipmaps=false; t.colorSpace=THREE.SRGBColorSpace; }
+  const rig = window.CharacterRig.createCharacter(THREE, tS, tG, { texCape:tC, texCapeGlow:tCG });
+  rig.setCape(cfg.cape);
+  // layout: hero big left-of-center, three smaller to the right at varying depth
+  if(cfg.role==='hero'){ rig.root.position.set(-190, 0, 30); rig.root.scale.setScalar(1.55); rig.snapTo('idle'); }
+  else if(cfg.role==='l'){ rig.root.position.set(40, 0, -30); rig.root.scale.setScalar(0.85); rig.snapTo('wave'); }
+  else if(cfg.role==='r1'){ rig.root.position.set(150, 0, -10); rig.root.scale.setScalar(0.85); rig.snapTo('idle'); }
+  else { rig.root.position.set(255, 0, -45); rig.root.scale.setScalar(0.85); rig.snapTo('dance'); }
+  rig.state.t = i * 1.3;
+  rig.root.rotation.y = cfg.role==='hero' ? -0.25 : 0.35;
+  scene.add(rig.root);
+  rigs.push(rig);
+});
+
+// camera: wide composition
+const cam = new THREE.PerspectiveCamera(30, W/H, 0.1, 2000);
+cam.position.set(10, 60, 430);
+cam.lookAt(30, 42, 0);
+
+// bloom
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, cam));
+composer.addPass(new EffectPass(cam, new BloomEffect({
+  blendFunction: POST_B.BlendFunction.ADD,
+  mipmapBlur: true,
+  luminanceThreshold: 0.42,
+  luminanceSmoothing: 0.3,
+  intensity: 1.7,
+  radius: 0.85,
+})));
+
+// typography overlay (drawn at full res, shown over preview, baked into save)
+const type = document.createElement('canvas');
+type.width = W; type.height = H;
+const tctx = type.getContext('2d');
+function drawType(){
+  tctx.clearRect(0,0,W,H);
+  // dark gradient banner top
+  const g = tctx.createLinearGradient(0,0,0,320);
+  g.addColorStop(0,'rgba(10,11,14,0.88)'); g.addColorStop(1,'rgba(10,11,14,0)');
+  tctx.fillStyle = g; tctx.fillRect(0,0,W,320);
+
+  tctx.textBaseline = 'top';
+  tctx.textAlign = 'left';
+  // kicker
+  tctx.font = '600 30px Segoe UI, Arial';
+  tctx.fillStyle = '#19e3ff';
+  tctx.letterSpacing = '14px';
+  tctx.fillText('MINECRAFT-STYLE SKIN PACK', 90, 74);
+  // title
+  tctx.font = '700 118px Segoe UI, Arial';
+  tctx.fillStyle = '#f2f4f8';
+  tctx.letterSpacing = '6px';
+  tctx.fillText('VOXEL CYBER-STREET', 84, 124);
+  // neon underline
+  const ug = tctx.createLinearGradient(90,0,1160,0);
+  ug.addColorStop(0,'#ff2d95'); ug.addColorStop(1,'#19e3ff');
+  tctx.fillStyle = ug;
+  tctx.shadowColor = '#ff2d95'; tctx.shadowBlur = 26;
+  tctx.fillRect(90, 268, 1060, 8);
+  tctx.shadowBlur = 0;
+  // subline
+  tctx.font = '600 34px Segoe UI, Arial';
+  tctx.fillStyle = '#c9cdd6';
+  tctx.letterSpacing = '10px';
+  tctx.fillText('36 SKINS  ·  GLOWING TECH CAPES  ·  BEDROCK READY', 90, 310);
+
+  // corner badge
+  tctx.textAlign = 'right';
+  tctx.font = '700 26px Segoe UI, Arial';
+  tctx.fillStyle = '#ff2d95';
+  tctx.letterSpacing = '6px';
+  tctx.fillText('PROCEDURAL EDITION', W-84, 84);
+  tctx.font = '500 20px Segoe UI, Arial';
+  tctx.fillStyle = '#8f949c';
+  tctx.letterSpacing = '4px';
+  tctx.fillText('64×64 · BASE + OVERLAY · SEED-STABLE', W-84, 120);
+}
+
+// preview scale-to-fit
+function fit(){
+  const sw = innerWidth, sh = innerHeight - 34 - 24;
+  const s = Math.min((sw-32)/W, (sh-16)/H);
+  frame.style.width  = Math.floor(W*s)+'px';
+  frame.style.height = Math.floor(H*s)+'px';
+  // overlay canvas positioned exactly over the render
+  type.style.position = 'absolute';
+  type.style.inset = '0';
+  type.style.width = '100%'; type.style.height = '100%';
+  if(type.parentNode !== frame) frame.appendChild(type);
+}
+window.addEventListener('resize', fit);
+
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  rigs.forEach(r=>r.tick(dt));
+  composer.render();
+}
+document.getElementById('btnGallery').addEventListener('click', ()=> location.href='gallery.html');
+document.getElementById('btnSave').addEventListener('click', ()=>{
+  const out = document.createElement('canvas');
+  out.width = W; out.height = H;
+  const ctx = out.getContext('2d');
+  ctx.drawImage(renderer.domElement, 0, 0);
+  ctx.drawImage(type, 0, 0);
+  const a = document.createElement('a');
+  a.download = 'voxel-cyber-street-cover-2048x1152.png';
+  a.href = out.toDataURL('image/png');
+  a.click();
+});
+
+fit();
+drawType();
+animate();
+document.getElementById('loader').classList.add('hide');
+</script>
+</body>
+</html>

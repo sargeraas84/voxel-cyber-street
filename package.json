@@ -1,0 +1,33 @@
+{
+  "name": "voxel-cyber-teen",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Minecraft-style cyberpunk teen — 36-skin procedural pack, 3D reference sheet with bloom, Bedrock .mcpack, Fabric mod, store icons, A3 poster, trailer capture",
+  "scripts": {
+    "skin": "node tools/generate-skin.js",
+    "pack": "node tools/lockstep-pack.js",
+    "pack:fast": "node tools/build-pack.js && node tools/export-mcpack.js && node tools/sync-fabric-resources.js && node tools/build-fabric-mod.js",
+    "langqa": "node tools/build-langqa.js",
+    "listing": "node tools/build-store-listing.js",
+    "letter": "node tools/build-cover-letter.js",
+    "compliance": "node tools/build-compliance.js",
+    "encode": "node tools/encode-director.js",
+    "submission": "node tools/build-submission-bundle.js",
+    "record": "node tools/record-trailer.js",
+    "formats": "node tools/export-trailer-formats.js",
+    "cover": "node tools/render-cover.js",
+    "icons": "node tools/render-icons.js",
+    "poster": "node tools/render-poster.js",
+    "fabric": "node tools/build-fabric-mod.js",
+    "fabric:compile": "bash tools/compile-fabric-mod.sh build",
+    "runclient": "bash tools/fabric-mod/run-client.sh",
+    "datapack": "node tools/build-datapack.js",
+    "starter": "node tools/build-starter-pack.js",
+    "validate": "node tools/validate-packs.js",
+    "trailer": "node tools/build-pack.js && node tools/export-mcpack.js && node tools/sync-fabric-resources.js && node tools/gen-egg-texture.js && node tools/build-fabric-mod.js && bash tools/compile-fabric-mod.sh build && node tools/render-cover.js && node tools/render-icons.js && node tools/render-poster.js && node tools/build-starter-pack.js && node tools/build-langqa.js && node tools/build-datapack.js && node tools/record-trailer.js && node tools/export-trailer-formats.js && node tools/build-store-listing.js && node tools/build-cover-letter.js && node tools/build-compliance.js && node tools/build-submission-bundle.js"
+  },
+  "devDependencies": {
+    "canvas": "^3.1.0",
+    "puppeteer": "^25.11.0"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/template_spawn_egg",
+  "textures": {
+    "layer0": "voxelcyberstreet:item/corrupted_skin_spawn_egg"
+  }
+}

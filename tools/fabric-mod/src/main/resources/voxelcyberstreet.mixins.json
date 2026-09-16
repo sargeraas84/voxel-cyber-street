@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.voxelcyberstreet.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "SkinApplierMixin",
+    "ZombieVillagerMixin"
+  ],
+  "client": [
+    "CorruptedSkinTextureMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Crect width='8' height='8' fill='%231f2023'/%3E%3Crect x='1' y='1' width='3' height='3' fill='%23fe2e96'/%3E%3Crect x='4' y='4' width='3' height='3' fill='%231de0fd'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL // CYBER-STREET — Submission Guide</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1f2023; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#cfd3d9; }
+
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:54px; z-index:20;
+    display:flex; align-items:center; gap:18px; padding:0 22px;
+    background:linear-gradient(180deg,#232429,#1c1d21);
+    border-bottom:1px solid #2e3037; box-shadow:0 2px 14px rgba(0,0,0,.45);
+  }
+  .logo{ font-weight:800; letter-spacing:2px; font-size:17px; color:#f2f4f8; white-space:nowrap; }
+  .logo b{ background:linear-gradient(90deg,#ff2d95,#19e3ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .crumb{ font-size:13px; color:#7b8290; }
+  .navbtns{ margin-left:auto; display:flex; gap:8px; }
+  .navbtn{
+    font-size:12.5px; color:#cfd3d9; text-decoration:none; padding:7px 13px; border-radius:8px;
+    border:1px solid #34363e; background:#24262c; transition:.15s;
+  }
+  .navbtn:hover{ border-color:#ff2d95; color:#fff; }
+
+  .wrap{ position:absolute; top:54px; bottom:0; left:0; right:0; display:flex; }
+  /* ---- step rail ---- */
+  .rail{
+    width:300px; min-width:220px; overflow-y:auto; padding:20px 14px 30px;
+    border-right:1px solid #2a2c33; background:#1b1c20;
+  }
+  .rail h2{ font-size:11px; letter-spacing:2.5px; color:#7b8290; margin:0 8px 12px; text-transform:uppercase; }
+  .step{
+    display:flex; gap:11px; align-items:flex-start; padding:11px 12px; margin-bottom:6px;
+    border-radius:10px; cursor:pointer; border:1px solid transparent; transition:.15s;
+  }
+  .step:hover{ background:#22242a; }
+  .step.active{ background:#242630; border-color:#3a3d47; }
+  .step .num{
+    width:26px; height:26px; min-width:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#0d0e11; background:linear-gradient(135deg,#ff2d95,#19e3ff);
+  }
+  .step.done .num{ background:#2e3138; color:#19e3ff; }
+  .step .t{ font-size:13.5px; font-weight:600; color:#e8ebf0; line-height:1.25; }
+  .step .s{ font-size:11.5px; color:#8a91a0; margin-top:3px; line-height:1.35; }
+  .progress{ margin:0 8px 16px; }
+  .progress .bar{ height:6px; border-radius:4px; background:#2a2c33; overflow:hidden; }
+  .progress .fill{ height:100%; width:0%; background:linear-gradient(90deg,#ff2d95,#19e3ff); transition:width .3s; }
+  .progress .lbl{ font-size:11px; color:#7b8290; margin-bottom:5px; }
+
+  /* ---- content ---- */
+  .content{ flex:1; overflow-y:auto; padding:34px 44px 80px; scroll-behavior:smooth; }
+  .panel{ max-width:860px; margin:0 auto 14px; background:#232429; border:1px solid #2e3037; border-radius:14px; padding:26px 30px; scroll-margin-top:16px; }
+  .panel h1{ font-size:21px; color:#f2f4f8; display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .panel h1 .chip{
+    font-size:11px; font-weight:700; letter-spacing:1px; padding:4px 10px; border-radius:20px;
+    background:linear-gradient(90deg,rgba(255,45,149,.18),rgba(25,227,255,.18)); color:#19e3ff; border:1px solid rgba(25,227,255,.3);
+  }
+  .panel p{ font-size:14px; line-height:1.65; margin:10px 0; }
+  .panel ul{ margin:10px 0 10px 20px; }
+  .panel li{ font-size:14px; line-height:1.7; }
+  .panel b{ color:#f2f4f8; }
+  .neon{ color:#19e3ff; }
+  .pink{ color:#ff2d95; }
+  .cmd{
+    display:flex; align-items:center; gap:10px; margin:10px 0; padding:11px 14px;
+    background:#141519; border:1px solid #2c2e36; border-radius:9px; font-family:Consolas,'Courier New',monospace;
+    font-size:13px; color:#9fe8f5;
+  }
+  .cmd .copy{
+    margin-left:auto; cursor:pointer; font-size:11px; letter-spacing:1px; color:#8a91a0;
+    border:1px solid #34363e; background:#1f2126; border-radius:6px; padding:4px 9px; font-family:inherit; transition:.15s;
+  }
+  .cmd .copy:hover{ color:#19e3ff; border-color:#19e3ff; }
+  .cmd .copied{ color:#19e3ff; border-color:#19e3ff; }
+  .note{
+    margin:12px 0; padding:12px 16px; border-left:3px solid #ff2d95; background:rgba(255,45,149,.06);
+    border-radius:0 9px 9px 0; font-size:13.5px; line-height:1.6;
+  }
+  .note.cyan{ border-left-color:#19e3ff; background:rgba(25,227,255,.06); }
+  .files{ margin:14px 0 4px; }
+  .file{
+    display:flex; align-items:center; gap:12px; padding:10px 14px; margin-bottom:6px;
+    background:#1d1f24; border:1px solid #2b2d35; border-radius:9px; font-size:13px;
+  }
+  .file .dot{ width:9px; height:9px; min-width:9px; border-radius:50%; background:#4a4e58; }
+  .file.ok .dot{ background:#3ddc84; box-shadow:0 0 8px rgba(61,220,132,.7); }
+  .file.missing .dot{ background:#ff2d95; box-shadow:0 0 8px rgba(255,45,149,.7); }
+  .file .nm{ font-family:Consolas,monospace; color:#e8ebf0; }
+  .file .ds{ color:#8a91a0; font-size:12px; margin-left:auto; text-align:right; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; }
+  @media (max-width:900px){ .grid2{ grid-template-columns:1fr; } }
+  .card{ background:#1d1f24; border:1px solid #2b2d35; border-radius:11px; padding:16px 18px; }
+  .card h3{ font-size:13px; color:#19e3ff; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase; }
+  .card p, .card li{ font-size:13px; line-height:1.6; }
+  a.link{ color:#19e3ff; text-decoration:none; border-bottom:1px dotted rgba(25,227,255,.5); }
+  a.link:hover{ color:#ff2d95; border-bottom-color:#ff2d95; }
+  .stepimg{ display:flex; gap:8px; margin:6px 0 2px; }
+  .stepimg .n{
+    width:22px; height:22px; min-width:22px; border-radius:6px; background:#2e3138; color:#19e3ff;
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-top:2px;
+  }
+  .stepimg .x{ font-size:13.5px; line-height:1.6; }
+  .footer-note{ max-width:860px; margin:0 auto; color:#666c78; font-size:12px; line-height:1.7; padding-bottom:30px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">VOXEL // <b>CYBER-STREET</b></div>
+  <div class="crumb">submission guide — press kit → Marketplace partner application</div>
+  <div class="navbtns">
+    <a class="navbtn" href="index.html">Reference sheet</a>
+    <a class="navbtn" href="gallery.html">Gallery</a>
+    <a class="navbtn" href="presskit.html">Press kit</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="rail">
+    <h2>Roadmap</h2>
+    <div class="progress">
+      <div class="lbl"><span id="progPct">0</span>% of steps checked off</div>
+      <div class="bar"><div class="fill" id="progFill"></div></div>
+    </div>
+    <div id="railSteps"></div>
+  </div>
+
+  <div class="content" id="content">
+
+    <!-- 1 -->
+    <div class="panel" id="s1">
+      <h1>1 · Build every deliverable <span class="chip">one command</span></h1>
+      <p>The whole pipeline is deterministic — one npm script generates the 36 skins, capes, both Bedrock packs, cover, icons, poster, and the Fabric mod, then validates each Bedrock pack against Microsoft's official skin-pack spec:</p>
+      <div class="cmd"><span>npm run trailer</span><button class="copy">COPY</button></div>
+      <p>Everything lands in two places: <b class="neon">dist/</b> (installable artifacts) and asset folders (<b class="neon">pack/</b>, <b class="neon">starter-pack/</b>, <b class="neon">icons/</b>, <b class="neon">poster/</b>, <b class="neon">cover/</b>).</p>
+      <div class="note cyan"><b>Spec compliance is enforced, not hoped for.</b> Both exporters run <span class="neon">exportValidMcpack()</span> — if the zip deviates from learn.microsoft.com's <i>Packaging a Skin Pack</i> doc in any way (manifest shape, skins.json fields, texture placement, .lang keys, languages.json), the build <b>fails with every violation listed</b>.</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="panel" id="s2">
+      <h1>2 · QA the pack visually <span class="chip">10 minutes</span></h1>
+      <p>Open the pages in this order and check each item:</p>
+      <div class="stepimg"><div class="n">a</div><div class="x"><b>gallery.html</b> — all 36 cells render, capes visible on hover, click-through works, no console errors (F12).</div></div>
+      <div class="stepimg"><div class="n">b</div><div class="x"><b>search.html</b> — filter pink-cyan + white-messy, expect <span class="neon">144 / 4320</span> matches; open one result and confirm the deep-link lands on the right skin.</div></div>
+      <div class="stepimg"><div class="n">c</div><div class="x"><b>index.html</b> — cycle all 4 animations, toggle the cape, confirm the bloom glow follows the neon trim.</div></div>
+      <div class="stepimg"><div class="n">d</div><div class="x"><b>Bedrock self-install</b> — double-click <span class="nm">dist/VOXEL-CYBER-STREET.mcpack</span>, open Minecraft Bedrock → Profile → Skins, confirm the pack appears with its <span class="neon">localized title</span> and every skin name renders (switch the game language to Deutsch / Français / 日本語 to see the translations swap).</div></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="panel" id="s3">
+      <h1>3 · Assemble the press kit <span class="chip">browser, no upload</span></h1>
+      <p><b>presskit.html</b> inventories every deliverable, then zips them client-side into one archive for submissions and partner applications:</p>
+      <div class="cmd"><span>open presskit.html → ⬇ Build press kit zip</span><button class="copy">COPY</button></div>
+      <p>The kit contains the cover, A3 poster, all 41 store icons, both .mcpacks, the Fabric jar + source, skin/cape PNGs, pack indexes and a generated README.txt. The page shows a live <b class="neon">✓ / ✗</b> per file — anything missing tells you exactly which build step to re-run.</p>
+    </div>
+
+    <!-- 4 -->
+    <div class="panel" id="s4">
+      <h1>4 · Record the marketing trailer <span class="chip">15 s or OBS</span></h1>
+      <p>Two options, fastest first:</p>
+      <div class="stepimg"><div class="n">a</div><div class="x"><b>One-click capture</b> — open <span class="nm">gallery.html?trailer=1</span> (or press <b>● Trailer</b>). It drives a scripted 6-shot sequence — title card, cape sweep, variant sweep, animation spotlight, full turntable, end card — and auto-downloads <span class="nm">voxel-cyber-street-trailer.webm</span> (1280×720, VP9). The full VO script for this cut is in <span class="nm">TRAILER.md</span>.</div></div>
+      <div class="stepimg"><div class="n">b</div><div class="x"><b>OBS master</b> — record the live gallery at 1080p60 with the shot list in TRAILER.md as your storyboard. Marketplace listings convert measurably better with motion in the first three seconds.</div></div>
+      <div class="note">The trailer only exists after a recording pass — the press kit page flags it as ✗ until you've captured one. Record before building the final zip.</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="panel" id="s5">
+      <h1>5 · Ship on the platforms you can reach today <span class="chip">no gate</span></h1>
+      <p>While the Marketplace application is in flight, the pack ships anywhere else:</p>
+      <div class="grid2">
+        <div class="card"><h3>Bedrock — direct</h3><p>The .mcpack installs by double-click on any Windows/Android/iOS Bedrock instance — share it on itch.io, Gumroad, or your own site. Non-partner packs must mark every skin <span class="nm">type: free</span> (ours already do) and can't appear in the in-game store.</p></div>
+        <div class="card"><h3>Java — mod portals</h3><p><span class="nm">voxel-cyber-street-fabric-1.21.jar</span> drops into <span class="nm">.minecraft/mods</span> and applies the skins + glowing capes to NPCs. Submit to CurseForge/Modrinth with the cover + trailer; link the src zip for review.</p></div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="panel" id="s6">
+      <h1>6 · Apply to the Marketplace partner program <span class="chip">the real gate</span></h1>
+      <p>Skins can only be <b>sold</b> inside the in-game Marketplace by approved partners. The path:</p>
+      <div class="stepimg"><div class="n">1</div><div class="x">Read the partner overview at <a class="link" href="https://www.minecraft.net/en-us/partners" target="_blank" rel="noopener">minecraft.net/partners</a> — Minecraft handles store curation through selected partner studios and programs rather than open self-serve listings.</div></div>
+      <div class="stepimg"><div class="n">2</div><div class="x">Prepare what every application asks for: a <b>portfolio</b> (your gallery + reference sheet pages), <b>store-ready assets</b> (the press kit zip: cover, icons at 512², trailer), and a <b>team/business identity</b> (partners generally work as registered studios; solo creators usually partner with an existing studio as an artist).</div></div>
+      <div class="stepimg"><div class="n">3</div><div class="x">Submit through the partner application form and reference your press kit. Expect review focus on <b>art consistency</b> (our 36 skins are one generator family — a strength), <b>localization</b> (4 languages ship in the box), and <b>technical compliance</b> (machine-validated against the packaging doc).</div></div>
+      <div class="stepimg"><div class="n">4</div><div class="x">Once accepted, flip skin <span class="nm">type</span> entries to <span class="nm">paid</span> in the exporter config, re-run <span class="nm">npm run trailer</span>, and resubmit — the validator accepts both values.</div></div>
+      <div class="note"><b>Reality check:</b> approval is competitive and Mojang/Microsoft currently onboard partners in cohorts. The direct Bedrock + Java routes in step 5 build the sales history and audience that make an application credible.</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="panel" id="s7">
+      <h1>7 · Keep the pipeline green <span class="chip">maintenance</span></h1>
+      <p>Any content change re-runs through the same gates:</p>
+      <ul>
+        <li><span class="nm">npm run pack</span> — regenerate skins after touching <span class="nm">skin-gen-core.js</span></li>
+        <li><span class="nm">npm run trailer</span> — rebuild + revalidate all artifacts</li>
+        <li>The spec validator fails the build on <b>any</b> deviation — never bypass it; fix the exporter instead</li>
+        <li>Re-record the trailer after any visual change so the press kit stays current</li>
+      </ul>
+    </div>
+
+    <!-- deliverables -->
+    <div class="panel" id="files">
+      <h1>Deliverable inventory <span class="chip">live check</span></h1>
+      <p>Queried from disk as this page loads:</p>
+      <div class="files" id="fileList"></div>
+    </div>
+
+    <div class="footer-note">
+      Spec source: <a class="link" href="https://learn.microsoft.com/en-us/minecraft/creator/documents/packagingaskinpack" target="_blank" rel="noopener">learn.microsoft.com — Packaging a Skin Pack</a>.
+      This guide is part of the VOXEL // CYBER-STREET project and runs fully offline.
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // ---------- rail ----------
+  const STEPS = [
+    { id:'s1', t:'Build every deliverable', s:'npm run trailer + spec validation' },
+    { id:'s2', t:'QA the pack visually',    s:'gallery · search · Bedrock self-install' },
+    { id:'s3', t:'Assemble the press kit',  s:'presskit.html → one zip' },
+    { id:'s4', t:'Record the trailer',      s:'trailer mode or OBS master' },
+    { id:'s5', t:'Ship where you can',      s:'direct Bedrock + Java portals' },
+    { id:'s6', t:'Apply to Marketplace',    s:'partner program submission' },
+    { id:'s7', t:'Keep the pipeline green', s:'rebuild + revalidate loop' },
+  ];
+  const rail = document.getElementById('railSteps');
+  const DONE_KEY = 'vcs-guide-done';
+  let done = {};
+  try { done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}'); } catch (_) { done = {}; }
+
+  for (const st of STEPS) {
+    const el = document.createElement('div');
+    el.className = 'step' + (done[st.id] ? ' done' : '');
+    el.dataset.id = st.id;
+    el.innerHTML = `<div class="num">${done[st.id] ? '✓' : STEPS.indexOf(st) + 1}</div><div><div class="t">${st.t}</div><div class="s">${st.s}</div></div>`;
+    el.addEventListener('click', () => {
+      document.getElementById(st.id).scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+    // double-click toggles done
+    el.addEventListener('dblclick', () => toggleDone(st.id));
+    rail.appendChild(el);
+    // click title checkbox in panel too
+    const panel = document.getElementById(st.id);
+    const h1 = panel.querySelector('h1');
+    h1.style.cursor = 'pointer';
+    h1.title = 'Click to mark this step done';
+    h1.addEventListener('click', () => toggleDone(st.id));
+  }
+  function toggleDone(id) {
+    done[id] = !done[id];
+    if (!done[id]) delete done[id];
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    refreshRail();
+  }
+  function refreshRail() {
+    document.querySelectorAll('.step').forEach(el => {
+      const isDone = !!done[el.dataset.id];
+      el.classList.toggle('done', isDone);
+      el.querySelector('.num').textContent = isDone ? '✓' : (STEPS.findIndex(s => s.id === el.dataset.id) + 1);
+    });
+    const pct = Math.round(Object.keys(done).length / STEPS.length * 100);
+    document.getElementById('progPct').textContent = pct;
+    document.getElementById('progFill').style.width = pct + '%';
+  }
+  refreshRail();
+
+  // ---------- scrollspy ----------
+  const panels = STEPS.map(s => document.getElementById(s.id));
+  const content = document.getElementById('content');
+  content.addEventListener('scroll', () => {
+    let active = panels[0].id;
+    for (const p of panels) {
+      if (p.getBoundingClientRect().top <= 120) active = p.id;
+    }
+    document.querySelectorAll('.step').forEach(el => el.classList.toggle('active', el.dataset.id === active));
+  }, { passive:true });
+
+  // ---------- copy buttons ----------
+  document.querySelectorAll('.cmd .copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.parentElement.querySelector('span').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'COPIED ✓'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1400);
+      });
+    });
+  });
+
+  // ---------- live deliverable inventory ----------
+  const FILES = [
+    { p:'cover/voxel-cyber-street-cover-2048x1152.png', d:'Marketplace cover 2048×1152' },
+    { p:'poster/voxel-cyber-street-poster-a3.png',      d:'A3 300-dpi poster' },
+    { p:'dist/VOXEL-CYBER-STREET.mcpack',               d:'Bedrock 36-skin pack (spec-validated)' },
+    { p:'dist/VOXEL-CYBER-STREET-STARTER.mcpack',       d:'Bedrock 5-skin starter pack' },
+    { p:'dist/voxel-cyber-street-fabric-1.21.jar',      d:'Fabric mod (MC 1.21, compiled)' },
+    { p:'dist/voxel-cyber-street-fabric-src.zip',       d:'Fabric source tree' },
+    { p:'icons/icon-01.png',                            d:'store icons 01–36 (512²)' },
+    { p:'starter-pack/starter-cover-1280x720.png',      d:'starter cover' },
+    { p:'voxel-cyber-street-trailer.webm',              d:'trailer — record via gallery ?trailer=1' },
+  ];
+  const list = document.getElementById('fileList');
+  let pending = FILES.length;
+  for (const f of FILES) {
+    const row = document.createElement('div');
+    row.className = 'file';
+    row.innerHTML = `<div class="dot"></div><span class="nm">${f.p}</span><span class="ds">checking…</span>`;
+    list.appendChild(row);
+    fetch(f.p, { method:'HEAD' }).then(r => {
+      const ok = r.ok;
+      row.classList.add(ok ? 'ok' : 'missing');
+      row.querySelector('.ds').textContent = ok
+        ? (f.d + ' · ready')
+        : f.d + ' · missing — run: npm run trailer';
+    }).catch(() => {
+      row.classList.add('missing');
+      row.querySelector('.ds').textContent = f.d + ' · unreachable';
+    }).finally(() => {
+      if (--pending === 0 && !FILES.some(() => false)) {/* done */}
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "voxelcyberstreet",
+  "version": "2.1.0",
+  "name": "VOXEL CYBER-STREET",
+  "description": "Cyber-street skin pack applied to NPCs: zombie villager conversions (\"Corrupted Skins\") with glowing tech capes, plus a player-entity skin hook for NPC platforms.",
+  "authors": [
+    "VOXEL // CYBER-STREET"
+  ],
+  "license": "CC-BY-NC-4.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.voxelcyberstreet.VoxelCyberStreet"
+    ],
+    "client": [
+      "com.voxelcyberstreet.VoxelCyberStreetClient"
+    ]
+  },
+  "mixins": [
+    "voxelcyberstreet.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21"
+  }
+}

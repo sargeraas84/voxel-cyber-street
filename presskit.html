@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL // CYBER-STREET — Press Kit Builder</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1f2023; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#cfd3d9; }
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:34px; z-index:20;
+    display:flex; align-items:center; gap:10px; padding:0 14px;
+    background:rgba(24,25,28,.92); border-bottom:1px solid #33353a;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8f949c;
+    white-space:nowrap;
+  }
+  .topbar b{ color:#e8ebee; letter-spacing:.18em; }
+  .dot{ width:7px;height:7px;border-radius:50%;background:#ff2d95;box-shadow:0 0 8px #ff2d95; }
+  .dot.c{ background:#19e3ff; box-shadow:0 0 8px #19e3ff; }
+  .topbar .spacer{ flex:1; }
+  .btn{
+    border:1px solid #4a4d55; background:#26282d; color:#dfe3e8; font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; cursor:pointer;
+    border-radius:2px; transition:all .15s;
+  }
+  .btn:hover{ background:#33363d; border-color:#5a5e67; }
+  .btn.primary{ border-color:#ff2d95; color:#ff9ccb; }
+  .btn:disabled{ opacity:.45; cursor:default; }
+
+  #wrap{ position:fixed; inset:34px 0 0 0; overflow-y:auto; padding:26px 4vw 60px; }
+  h1{ font:700 30px 'Segoe UI',Arial; color:#f2f4f8; letter-spacing:.04em; margin-bottom:6px; }
+  .sub{ font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#19e3ff; margin-bottom:22px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+  .card{
+    background:#1c1e24; border:1px solid #33353a; border-radius:4px; padding:14px 16px;
+    display:flex; gap:12px; align-items:center;
+  }
+  .card.missing{ opacity:.4; }
+  .card .sw{ width:38px; height:38px; border-radius:3px; flex:none;
+    background:#26282d; border:1px solid #4a4d55; display:flex; align-items:center; justify-content:center;
+    font:700 15px Consolas,monospace; color:#19e3ff; }
+  .card .t{ font-size:12px; color:#e8ebee; letter-spacing:.06em; }
+  .card .d{ font-size:10px; color:#8f949c; margin-top:3px; letter-spacing:.04em; line-height:1.5; }
+  .card .d b{ color:#c9cdd6; font-weight:600; }
+
+  #buildBar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    display:flex; align-items:center; gap:16px; padding:12px 4vw;
+    background:rgba(24,25,28,.96); border-top:1px solid #33353a;
+  }
+  #buildBar .info{ font-size:11px; color:#8f949c; letter-spacing:.08em; }
+  #progressWrap{ flex:1; height:4px; background:#26282d; border-radius:2px; overflow:hidden; }
+  #progress{ height:100%; width:0%; background:linear-gradient(90deg,#ff2d95,#19e3ff); transition:width .15s; }
+  #log{ font:10px Consolas,monospace; color:#6f747d; max-width:340px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="dot"></span><span class="dot c"></span>
+  <b>PRESS KIT</b>
+  <span>one-click bundle for store submissions</span>
+  <span class="spacer"></span>
+  <button class="btn" id="btnBack">← Gallery</button>
+  <button class="btn" id="btnGuide">📖 Guide</button>
+  <button class="btn" id="btnLang">🌐 Lang QA</button>
+  <button class="btn" id="btnStore">🏪 Listing</button>
+  <button class="btn" id="btnLetter">✉ Letter</button>
+</div>
+
+<div id="wrap">
+  <h1>VOXEL CYBER-STREET — Press Kit</h1>
+  <div class="sub">Everything a Marketplace / store submission needs, in one zip</div>
+  <div class="grid" id="manifest"></div>
+</div>
+
+<div id="buildBar">
+  <button class="btn primary" id="btnBuild" style="font-size:12px; padding:9px 22px;">⬇ Build press-kit.zip</button>
+  <div id="progressWrap"><div id="progress"></div></div>
+  <span class="info" id="status">scanning files…</span>
+  <span id="log"></span>
+</div>
+
+<script src="jszip.min.js"></script>
+<script>
+/* ============================================================================
+   PRESS KIT BUILDER — zips every deliverable into voxel-cyber-street-presskit.zip
+   with a generated README.txt. Files are fetched from the dev server (they are
+   all under the project root). Zip is assembled client-side with JSZip.
+   ========================================================================== */
+const ENTRIES = [
+  { path: 'cover/voxel-cyber-street-cover-2048x1152.png', zip: 'cover/cover-2048x1152.png',                label: 'Cover',        desc: '2048×1152 store cover' },
+  { path: 'poster/voxel-cyber-street-poster-a3.png',      zip: 'poster/poster-a3-300dpi.png',             label: 'Poster',       desc: 'A3 300 dpi trading-card poster' },
+  { path: 'voxel-cyber-street-trailer.webm',              zip: 'trailer/voxel-cyber-street-trailer.webm', label: 'Trailer (master)', desc: 'webm master — record: gallery.html?trailer=1 or npm run record' },
+  { path: 'trailer/voxel-cyber-street-trailer.mp4',       zip: 'trailer/voxel-cyber-street-trailer.mp4',  label: 'Trailer MP4',      desc: '1280×720 H.264 store upload' },
+  { path: 'trailer/voxel-cyber-street-trailer-1080p.mp4', zip: 'trailer/voxel-cyber-street-trailer-1080p.mp4', label: 'Trailer 1080p', desc: '1920×1080 H.264 (YouTube/press)' },
+  { path: 'trailer/voxel-cyber-street-trailer-square.mp4', zip: 'trailer/voxel-cyber-street-trailer-square.mp4', label: 'Trailer square', desc: '1080×1080 (Instagram feed)' },
+  { path: 'trailer/voxel-cyber-street-trailer-vertical.mp4', zip: 'trailer/voxel-cyber-street-trailer-vertical.mp4', label: 'Trailer vertical', desc: '1080×1920 (Shorts/TikTok/Reels)' },
+  { path: 'dist/vcsdemo-neon-district.zip',               zip: 'demo/vcsdemo-neon-district.zip',          label: 'Demo datapack', desc: 'Neon District in-game showcase (DEMO.md)' },
+  { path: 'dist/VOXEL-CYBER-STREET.mcpack',               zip: 'minecraft/VOXEL-CYBER-STREET.mcpack',     label: 'Bedrock pack', desc: '36 skins + capes .mcpack' },
+  { path: 'dist/VOXEL-CYBER-STREET-STARTER.mcpack',       zip: 'minecraft/VOXEL-CYBER-STREET-STARTER.mcpack', label: 'Starter pack', desc: '5-skin starter .mcpack' },
+  { path: 'dist/voxel-cyber-street-fabric-1.0.0.jar',     zip: 'java/voxel-cyber-street-fabric-1.0.0.jar',label: 'Fabric mod',   desc: 'NPC skins+capes (Java Edition)' },
+  { path: 'dist/voxel-cyber-street-fabric-1.21.jar',      zip: 'java/voxel-cyber-street-fabric-1.21.jar', label: 'Fabric mod (compiled)', desc: 'Remapped vs MC 1.21 — drop into mods/' },
+  { path: 'dist/voxel-cyber-street-fabric-src.zip',       zip: 'java/voxel-cyber-street-fabric-src.zip',  label: 'Fabric source',desc: 'Gradle-ready source tree' },
+  { path: 'pack/pack.json',                               zip: 'skins/pack.json',                         label: 'Skins index',  desc: '36-skin manifest' },
+];
+for (let i = 1; i <= 36; i++) {
+  const n = String(i).padStart(2, '0');
+  ENTRIES.push({ path: `icons/icon-${n}.png`, zip: `icons/icon-${n}.png`, label: `Icon ${n}`, desc: '512×512 store portrait', quiet: true });
+}
+for (let i = 1; i <= 5; i++) {
+  ENTRIES.push({ path: `starter-pack/icons/starter-icon-${i}.png`, zip: `icons/starter-icon-${i}.png`, label: `Starter icon ${i}`, desc: '512×512', quiet: true });
+}
+const README = `VOXEL CYBER-STREET — PRESS KIT
+==============================
+
+Contents
+--------
+cover/      2048x1152 Marketplace cover
+poster/     A3 300 dpi trading-card poster
+trailer/    webm master (VP9 1280x720) + MP4 exports: store 720p, 1080p, square 1:1, vertical 9:16
+demo/       Neon District demo datapack — self-guided Corrupted-Skin showcase (see DEMO.md)
+minecraft/  Bedrock .mcpack (36 skins) + 5-skin starter .mcpack
+java/       Fabric mod jars + gradle-ready source (MC 1.21, Loom 1.7.4)
+skins/      36 skin PNGs (64x64, base+overlay) + 36 cape PNGs (64x32)
+icons/      512x512 store portraits (36 pack + 5 starter)
+
+Quick facts
+-----------
+- Procedural, seed-stable skin generator (12 accent pairs x 6 hair looks x 6 fits)
+- Every skin ships with a matching glowing tech cape (standard 64x32 slot)
+- Bedrock: double-click the .mcpack, skins appear under Settings > Skin
+- Java: drop the jar into .minecraft/mods (or rebuild with gradlew build)
+- Reference sheet: index.html?accent=<a>&hair=<h>&fit=<f>&seed=<s>&cape=1
+
+Contact / licensing
+-------------------
+CC-BY-NC-4.0 for the code; art assets licensed per store agreement.
+`;
+
+const manifestEl = document.getElementById('manifest');
+const statusEl = document.getElementById('status');
+const progressEl = document.getElementById('progress');
+const logEl = document.getElementById('log');
+const btnBuild = document.getElementById('btnBuild');
+
+// starter skin files on disk are <kind>_<index>_<accent>.png; pack.json carries index+accent
+let starterNames = [];
+fetch('starter-pack/pack.json').then(r => r.ok ? r.json() : null).then(j => {
+  if (j && j.skins) {
+    starterNames = j.skins.flatMap(m => [
+      { path: `starter-pack/skin_${m.index}_${m.accent}.png`, zip: `skins/starter-skin-${m.index}.png` },
+      { path: `starter-pack/cape_${m.index}_${m.accent}.png`, zip: `skins/starter-cape-${m.index}.png` },
+    ]);
+    render();
+  }
+});
+
+function render(){
+  manifestEl.innerHTML = '';
+  const shown = ENTRIES.slice();
+  if (starterNames.length) {
+    shown.push({ label: 'Starter skins', desc: `5 skins + 5 capes<br><b>starter-pack/</b>` });
+  }
+  shown.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    const file = e.path ? e.path.split('/').pop() : 'starter-pack/';
+    div.innerHTML = `<div class="sw">${e.label[0]}</div><div><div class="t">${e.label}</div><div class="d">${e.desc}<br><b>${file}</b></div></div>`;
+    manifestEl.appendChild(div);
+  });
+}
+
+async function fetchBlob(path){
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(`${path} → ${r.status}`);
+  return await r.blob();
+}
+
+btnBuild.addEventListener('click', async () => {
+  btnBuild.disabled = true;
+  const zip = new JSZip();
+  const all = ENTRIES.concat(starterNames);
+  let done = 0, failed = [];
+  for (const e of all) {
+    try {
+      const blob = await fetchBlob(e.path);
+      zip.file(e.zip, blob);
+      logEl.textContent = '✓ ' + e.zip;
+    } catch (err) {
+      failed.push(e.path);
+      logEl.textContent = '· skipped ' + e.path;
+    }
+    done++;
+    progressEl.style.width = (done / all.length * 100).toFixed(1) + '%';
+    statusEl.textContent = `${done} / ${all.length}`;
+    await new Promise(r => setTimeout(r, 10));   // let the bar paint
+  }
+  zip.file('README.txt', README);
+  statusEl.textContent = 'compressing…';
+  const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } }, meta => {
+    statusEl.textContent = `compressing… ${meta.percent.toFixed(0)}%`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'voxel-cyber-street-presskit.zip';
+  a.click();
+  if (failed.length === 1 && failed[0].includes('trailer')) {
+    statusEl.textContent = 'done — trailer not recorded yet (npm run record)';
+  } else {
+    statusEl.textContent = failed.length ? `done — ${failed.length} file(s) missing` : 'done — all files bundled';
+  }
+  logEl.textContent = `voxel-cyber-street-presskit.zip (${(blob.size/1024/1024).toFixed(1)} MB)`;
+  btnBuild.disabled = false;
+});
+
+document.getElementById('btnBack').addEventListener('click', ()=> location.href='gallery.html');
+document.getElementById('btnGuide').addEventListener('click', ()=> location.href='guide.html');
+document.getElementById('btnLang').addEventListener('click', ()=> location.href='langqa.html');
+document.getElementById('btnStore').addEventListener('click', ()=> location.href='store-listing.html');
+document.getElementById('btnLetter').addEventListener('click', ()=> location.href='cover-letter.html');
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# generated pack artifacts
+dist/
+pack/
+starter-pack/
+trailer/
+icons/
+poster/
+cover/
+langqa.html
+store-listing.html
+cover-letter.html
+compliance.html
+voxel-cyber-street-trailer.webm
+voxel-cyber-street-gameplay-demo.mp4
+
+# portable toolchain (CI bootstraps its own)
+.toolchain/
+
+# gradle
+tools/fabric-mod/build/
+tools/fabric-mod/run/
+.gradle/
+
+# node
+node_modules/
+
+# logs and scratch
+*.log
+.server.log
+.trailer-clean.log
+.pack-full.log
+.DS_Store
+
+# app-local metadata
+.freebuff/

@@ -1,0 +1,24 @@
+plugins {
+    id 'fabric-loom' version '1.7.4'
+    id 'java'
+}
+version = '2.1.0'
+group = 'com.voxelcyberstreet'
+base { archivesName = 'voxel-cyber-street-fabric' }
+repositories { mavenCentral(); maven { url = 'https://maven.fabricmc.net' } }
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21'
+    mappings 'net.fabricmc:yarn:1.21+build.9:v2'
+    modImplementation 'net.fabricmc:fabric-loader:0.16.14'
+    // client entrypoint + EntityRendererRegistry come from fabric-api
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.100.8+1.21'
+}
+java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
+
+tasks.register('printMcJar') {
+    doLast {
+        configurations.compileClasspath.files.each { f ->
+            if (f.name.contains('minecraft')) println "MCJAR:${f.absolutePath}"
+        }
+    }
+}

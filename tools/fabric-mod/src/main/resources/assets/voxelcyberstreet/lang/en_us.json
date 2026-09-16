@@ -1,0 +1,15 @@
+{
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg": "Corrupted Skin Spawn Egg",
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg.lore": "Cyber-teen zombie villager",
+
+  "voxelcyberstreet.vconfig.show": "[VOXEL CYBER-STREET] config — corruptionRate 1-in-%s, capes %s, glow %s, spawnEgg %s, hideEggNames %s, eggPoseMode %s (config/voxelcyberstreet.json — /vconfig reload)",
+  "voxelcyberstreet.vconfig.reloaded": "[VOXEL CYBER-STREET] config reloaded from config/voxelcyberstreet.json",
+  "voxelcyberstreet.vconfig.set.rate": "[VOXEL CYBER-STREET] corruptionRate = %s",
+  "voxelcyberstreet.vconfig.set.bool": "[VOXEL CYBER-STREET] %s = %s (saved)",
+  "voxelcyberstreet.vconfig.unknown": "[VOXEL CYBER-STREET] unknown field %s. Fields: %s",
+
+  "voxelcyberstreet.director.routes": "[VOXEL CYBER-STREET] Director routes: %s",
+  "voxelcyberstreet.director.rolling": "[VOXEL CYBER-STREET] Director: rolling '%s' — %s frames → run/screenshots/director/<route>/ %s",
+  "voxelcyberstreet.director.progress": "[VOXEL CYBER-STREET] Director: %s — %s%%",
+  "voxelcyberstreet.director.unknown": "[VOXEL CYBER-STREET] unknown route %s. Routes: %s"
+}

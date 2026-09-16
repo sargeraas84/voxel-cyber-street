@@ -1,0 +1,16 @@
+{
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg": "コラプテッドスキンのスポーンエッグ",
+  "item.voxelcyberstreet.corrupted_skin_spawn_egg.lore": "サイバーティーンのゾンビ村人",
+
+  "voxelcyberstreet.vconfig.show": "[VOXEL CYBER-STREET] 設定 — corruptionRate 1/%s、capes %s、glow %s、spawnEgg %s、hideEggNames %s、eggPoseMode %s（config/voxelcyberstreet.json — /vconfig reload）",
+  "voxelcyberstreet.vconfig.reloaded": "[VOXEL CYBER-STREET] 設定を再読み込みしました（config/voxelcyberstreet.json）",
+  "voxelcyberstreet.vconfig.set.rate": "[VOXEL CYBER-STREET] corruptionRate = %s",
+  "voxelcyberstreet.vconfig.set.bool": "[VOXEL CYBER-STREET] %s = %s（保存済み）",
+  "voxelcyberstreet.vconfig.unknown": "[VOXEL CYBER-STREET] 不明な項目 %s。項目一覧：%s",
+
+  "voxelcyberstreet.director.routes": "[VOXEL CYBER-STREET] ディレクターのルート：%s",
+  "voxelcyberstreet.director.rolling": "[VOXEL CYBER-STREET] ディレクター：「%s」を撮影中 — %sフレーム → run/screenshots/director/<route>/ %s",
+  "voxelcyberstreet.director.stop": "[VOXEL CYBER-STREET] ディレクター：カット — %s（%sフレーム）。エンコード：npm run encode",
+  "voxelcyberstreet.director.progress": "[VOXEL CYBER-STREET] ディレクター：%s — %s%%",
+  "voxelcyberstreet.director.unknown": "[VOXEL CYBER-STREET] 不明なルート %s。ルート一覧：%s"
+}

@@ -1,0 +1,73 @@
+name: Release
+
+# Builds the full pack (skins, Bedrock .mcpacks, Fabric 1.21 jar, trailer,
+# MP4 exports, press pages) and attaches every artifact to a GitHub release.
+# Trigger: push a tag like v2.0.1
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install canvas native deps + ffmpeg (linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev ffmpeg
+
+      - name: Install node deps
+        run: npm install --no-audit --no-fund
+
+      # belt-and-braces: puppeteer's postinstall downloads Chrome, but make it explicit
+      - name: Install headless Chrome for the trailer recorder
+        run: npx puppeteer browsers install chrome
+
+      - name: Build everything (skins → mcpacks → Fabric jar → trailer → MP4s → pages)
+        run: npm run trailer
+        env:
+          CI: 'true'
+
+      - name: Validate packs
+        run: node tools/validate-packs.js
+
+      - name: Build the portal-order submission bundle
+        run: node tools/build-submission-bundle.js
+
+      - name: Organize release artifacts
+        run: |
+          mkdir -p release
+          cp dist/VOXEL-CYBER-STREET.mcpack release/
+          cp dist/VOXEL-CYBER-STREET-STARTER.mcpack release/
+          cp dist/voxel-cyber-street-fabric-1.21.jar release/
+          cp dist/voxel-cyber-street-fabric-src.zip release/
+          cp dist/vcsdemo-neon-district.zip release/
+          cp dist/voxel-cyber-street-submission.zip release/
+          cp voxel-cyber-street-trailer.webm release/
+          cp trailer/*.mp4 release/
+          zip -r release/voxel-cyber-street-presskit.zip \
+            cover poster icons langqa.html store-listing.html \
+            cover-letter.html compliance.html
+          ls -la release/
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

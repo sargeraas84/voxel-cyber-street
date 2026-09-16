@@ -1,0 +1,222 @@
+{
+  "serialize_name": "VoxelCyberStreet",
+  "localization_name": "VoxelCyberStreet",
+  "skins": [
+    {
+      "localization_name": "skin_01_pink_cyan_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-01-pink-cyan-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_02_cyan_pink_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-02-cyan-pink-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_03_magenta_lime_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-03-magenta-lime-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_04_lime_cyan_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-04-lime-cyan-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_05_orange_cyan_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-05-orange-cyan-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_06_violet_pink_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-06-violet-pink-smoke-teal-bomber-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_07_red_cyan_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-07-red-cyan-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_08_gold_cyan_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-08-gold-cyan-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_09_ice_violet_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-09-ice-violet-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_10_mint_pink_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-10-mint-pink-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_11_pink_cyan_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-11-pink-cyan-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_12_cyan_pink_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-12-cyan-pink-smoke-teal-bomber-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_13_magenta_lime_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-13-magenta-lime-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_14_lime_cyan_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-14-lime-cyan-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_15_orange_cyan_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-15-orange-cyan-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_16_violet_pink_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-16-violet-pink-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_17_red_cyan_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-17-red-cyan-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_18_gold_cyan_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-18-gold-cyan-smoke-teal-bomber-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_19_ice_violet_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-19-ice-violet-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_20_mint_pink_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-20-mint-pink-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_21_pink_cyan_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-21-pink-cyan-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_22_cyan_pink_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-22-cyan-pink-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_23_magenta_lime_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-23-magenta-lime-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_24_lime_cyan_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-24-lime-cyan-smoke-teal-bomber-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_25_orange_cyan_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-25-orange-cyan-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_26_violet_pink_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-26-violet-pink-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_27_red_cyan_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-27-red-cyan-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_28_gold_cyan_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-28-gold-cyan-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_29_ice_violet_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-29-ice-violet-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_30_mint_pink_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-30-mint-pink-smoke-teal-bomber-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_31_pink_cyan_white_messy_bomber",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-31-pink-cyan-white-messy-bomber.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_32_cyan_pink_ash_grey_longline",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-32-cyan-pink-ash-grey-longline.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_33_magenta_lime_ice_blue_vest_hood",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-33-magenta-lime-ice-blue-vest-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_34_lime_cyan_candy_mint_tech_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-34-lime-cyan-candy-mint-tech-hood.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_35_orange_cyan_platinum_pink_kimono_tech",
+      "geometry": "geometry.humanoid.custom",
+      "texture": "skin-35-orange-cyan-platinum-pink-kimono-tech.png",
+      "type": "free"
+    },
+    {
+      "localization_name": "skin_36_violet_pink_smoke_teal_bomber_hood",
+      "geometry": "geometry.humanoid.customSlim",
+      "texture": "skin-36-violet-pink-smoke-teal-bomber-hood.png",
+      "type": "free"
+    }
+  ]
+}

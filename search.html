@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL // CYBER-STREET — Seed Search</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1f2023; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#cfd3d9; }
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:34px; z-index:20;
+    display:flex; align-items:center; gap:10px; padding:0 14px;
+    background:rgba(24,25,28,.92); border-bottom:1px solid #33353a;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8f949c;
+    white-space:nowrap;
+  }
+  .topbar b{ color:#e8ebee; letter-spacing:.18em; }
+  .dot{ width:7px;height:7px;border-radius:50%;background:#ff2d95;box-shadow:0 0 8px #ff2d95; }
+  .dot.c{ background:#19e3ff; box-shadow:0 0 8px #19e3ff; }
+  .topbar .spacer{ flex:1; }
+  .btn{
+    border:1px solid #4a4d55; background:#26282d; color:#dfe3e8; font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; cursor:pointer;
+    border-radius:2px; transition:all .15s;
+  }
+  .btn:hover{ background:#33363d; border-color:#5a5e67; }
+
+  /* filter panel */
+  #panel{
+    position:fixed; top:34px; left:0; right:0; z-index:10;
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+    padding:12px 16px; background:rgba(28,29,34,.94); border-bottom:1px solid #2b2d33;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; }
+  .field label{ font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#6f747d; }
+  .field select{
+    background:#26282d; color:#e8ebee; border:1px solid #4a4d55; border-radius:2px;
+    font:11px 'Segoe UI', Arial; padding:4px 6px; min-width:130px; cursor:pointer;
+  }
+  #seedIn{
+    background:#26282d; color:#19e3ff; border:1px solid #4a4d55; border-radius:2px;
+    font:700 12px Consolas, monospace; padding:5px 8px; width:90px;
+  }
+  #seedIn::placeholder{ color:#5a5e67; font-weight:400; }
+  #count{ font-size:10px; letter-spacing:.12em; color:#8f949c; text-transform:uppercase; }
+  #count b{ color:#19e3ff; }
+
+  #wrap{ position:fixed; inset:34px 0 0 0; }
+  canvas{ display:block; }
+  .loader{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:#1f2023; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#8f949c;
+    transition:opacity .6s;
+  }
+  .loader.hide{ opacity:0; pointer-events:none; }
+  .loader .p{ color:#19e3ff; animation:pulse 1.2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.4} 50%{opacity:1} }
+  .empty{
+    position:fixed; top:130px; left:0; right:0; text-align:center; z-index:5;
+    font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#6f747d; display:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader"><span>BUILDING INDEX&nbsp;</span><span class="p">▮▮▮</span></div>
+
+<div class="topbar">
+  <span class="dot"></span><span class="dot c"></span>
+  <b>SEED SEARCH</b>
+  <span>find your look · click a card to open its reference sheet</span>
+  <span class="spacer"></span>
+  <button class="btn" id="btnGallery">← Gallery</button>
+  <button class="btn" id="btnSheet">Reference Sheet</button>
+</div>
+
+<div id="panel">
+  <div class="field"><label>Accent</label><select id="fAccent"><option value="">any</option></select></div>
+  <div class="field"><label>Hair</label><select id="fHair"><option value="">any</option></select></div>
+  <div class="field"><label>Fit</label><select id="fFit"><option value="">any</option></select></div>
+  <div class="field"><label>Seed</label><input id="seedIn" type="text" placeholder="e.g. 42" inputmode="numeric"></div>
+  <div class="field"><label>&nbsp;</label><button class="btn" id="btnRoll">🎲 Random</button></div>
+  <div class="field"><label>&nbsp;</label><button class="btn" id="btnReset">Reset</button></div>
+  <div class="field" style="margin-left:auto"><label>&nbsp;</label><span id="count"></span></div>
+</div>
+
+<div id="wrap"></div>
+<div class="empty" id="empty">no skins match — loosen a filter</div>
+
+<script src="skin-gen-core.js"></script>
+<script src="character-rig.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.35.3/build/index.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import * as POST_B from 'postprocessing';
+import { EffectComposer, RenderPass, EffectPass, BloomEffect } from 'postprocessing';
+/* ============================================================================
+   SEED SEARCH — filter the full 12×6×6 style space (4,320 combos) by accent,
+   hair, fit and seed; browse live 3D results; deep-link into the sheet.
+   Matches the pack layout (first 36 results = pack order).
+   ========================================================================== */
+const { createSkin, ACCENTS, HAIRS, FITS } = window.SkinGenCore;
+const ACC = Object.keys(ACCENTS), HR = Object.keys(HAIRS), FT = FITS;
+
+// ---- populate filters
+for (const a of ACC)  document.getElementById('fAccent').insertAdjacentHTML('beforeend', `<option>${a}</option>`);
+for (const h of HR)   document.getElementById('fHair').insertAdjacentHTML('beforeend', `<option>${h}</option>`);
+for (const f of FT)   document.getElementById('fFit').insertAdjacentHTML('beforeend', `<option>${f}</option>`);
+
+// ---- the full style space, in pack order
+const ALL = [];
+for (let i = 0; ALL.length < 4320; i++) {
+  const cfg = { accent: ACC[i % ACC.length], hair: HR[i % HR.length], fit: FT[i % FT.length], seed: 2000 + i, cape: true, index: ALL.length + 1 };
+  ALL.push(cfg);
+  if (i > 5000) break; // safety
+}
+
+const wrap = document.getElementById('wrap');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1f2023);
+scene.add(new THREE.AmbientLight(0x8a93a5, 0.75));
+const key = new THREE.DirectionalLight(0xffffff, 1.25); key.position.set(60,90,80); scene.add(key);
+const rimC = new THREE.DirectionalLight(0x19e3ff, 0.5); rimC.position.set(-70,40,-60); scene.add(rimC);
+const rimP = new THREE.DirectionalLight(0xff2d95, 0.35); rimP.position.set(80,20,-50); scene.add(rimP);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+wrap.appendChild(renderer.domElement);
+
+// ---- virtualized result grid (shared scene, per-cell cameras)
+let items = [];                 // visible result list: {cfg, rig, desc}
+const cellMap = new Map();      // cfg key -> { rig, ped }
+const pedGeo = new THREE.CylinderGeometry(6.5, 7.5, 1.0, 32);
+const pedMat = new THREE.MeshLambertMaterial({ color:0x26282d });
+const ringGeo = new THREE.TorusGeometry(6.8, 0.16, 8, 48);
+function mkPedestal(){
+  const m = new THREE.Mesh(pedGeo, pedMat); m.position.y = -0.5;
+  const r1 = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color:0x19e3ff, transparent:true, opacity:0.8 }));
+  r1.rotation.x = Math.PI/2; r1.position.y = 0.15; m.add(r1);
+  return m;
+}
+
+function keyOf(cfg){ return `${cfg.accent}|${cfg.hair}|${cfg.fit}|${cfg.seed}`; }
+
+function acquireCell(cfg){
+  const k = keyOf(cfg);
+  let cell = cellMap.get(k);
+  if (!cell) {
+    const { canvas, glowCanvas, capeCanvas, capeGlowCanvas, desc } = createSkin(cfg);
+    const tS = new THREE.CanvasTexture(canvas);
+    const tG = new THREE.CanvasTexture(glowCanvas);
+    const tC = new THREE.CanvasTexture(capeCanvas);
+    const tCG= new THREE.CanvasTexture(capeGlowCanvas);
+    for(const t of [tS,tG,tC,tCG]){ t.magFilter=THREE.NearestFilter; t.minFilter=THREE.NearestFilter; t.generateMipmaps=false; t.colorSpace=THREE.SRGBColorSpace; }
+    const rig = window.CharacterRig.createCharacter(THREE, tS, tG, { texCape:tC, texCapeGlow:tCG });
+    rig.setCape(true);
+    rig.snapTo(['idle','wave','walk','dance'][cfg.seed % 4]);
+    rig.state.t = cfg.seed * 0.13;
+    const ped = mkPedestal();
+    scene.add(rig.root, ped);
+    cell = { rig, ped, desc };
+    cellMap.set(k, cell);
+  }
+  return cell;
+}
+
+function releaseFiltered(){ /* cells stay pooled in the scene; hidden via visibility */ }
+
+// ---- filter engine
+function currentFilter(){
+  return {
+    accent: document.getElementById('fAccent').value,
+    hair:   document.getElementById('fHair').value,
+    fit:    document.getElementById('fFit').value,
+    seed:   document.getElementById('seedIn').value.trim(),
+  };
+}
+function applyFilter(){
+  const f = currentFilter();
+  items = ALL.filter(c =>
+    (!f.accent || c.accent === f.accent) &&
+    (!f.hair   || c.hair   === f.hair)   &&
+    (!f.fit    || c.fit    === f.fit)    &&
+    (!f.seed   || c.seed   === Number(f.seed))
+  ).slice(0, 240);   // cap the live grid; refine filters to narrow further
+  const pool = new Set(items.map(keyOf));
+  for (const [k, cell] of cellMap) cell.rig.root.visible = cell.ped.visible = pool.has(k);
+  // (re)acquire the first page of results eagerly
+  items.slice(0, 24).forEach(acquireCell);
+  layout(true);
+  document.getElementById('count').innerHTML = `<b>${items.length}</b> / 4320 looks`;
+  document.getElementById('empty').style.display = items.length ? 'none' : 'block';
+}
+
+// ---- virtual grid layout (3 cols)
+const COLS = 3, PAD = 10, TOPPAD = 6;
+let rects = [], VH = 0, scrollY = 0, scrollMax = 0;
+function computeRects(w, h){
+  const cw = (w - PAD*(COLS+1)) / COLS;
+  const ch = Math.max(190, Math.min(250, cw*1.72));
+  rects = items.map((it, i) => {
+    const r = Math.floor(i / COLS), c = i % COLS;
+    return { x: PAD + c*(cw+PAD), y: TOPPAD + r*(ch+PAD), w:cw, h:ch };
+  });
+  VH = TOPPAD + Math.ceil(items.length / COLS) * (ch+PAD);
+  scrollMax = Math.max(0, VH - h);
+  scrollY = Math.min(scrollY, scrollMax);
+}
+function layout(rebuild){
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  overlay.width = w; overlay.height = h;
+  overlay.style.width = w+'px'; overlay.style.height = h+'px';
+  computeRects(w, h);
+  drawLabels(h);
+}
+
+// ---- composers (LRU, same pattern as gallery)
+let comps = new Map(), frameCount = 0;
+function ensureComposer(i, w, h){
+  let c = comps.get(i);
+  if(c){ c.lastSeen = frameCount; comps.delete(i); comps.set(i, c); return c; }
+  const r = rects[i];
+  const cam = new THREE.PerspectiveCamera(30, r.w/r.h, 0.1, 500);
+  cam.position.set(40, 33, 78); cam.lookAt(0, 17.8, 0);
+  const comp = new EffectComposer(renderer);
+  comp.addPass(new RenderPass(scene, cam));
+  comp.addPass(new EffectPass(cam, new BloomEffect({
+    blendFunction: POST_B.BlendFunction.ADD, mipmapBlur: true,
+    luminanceThreshold: 0.35, luminanceSmoothing: 0.3, intensity: 2.0, radius: 0.75,
+  })));
+  c = { comp, cam, lastSeen: frameCount };
+  comps.set(i, c);
+  while(comps.size > 18){
+    let oldestKey = null, oldest = Infinity;
+    for(const [k,v] of comps){ if(v.lastSeen < oldest){ oldest = v.lastSeen; oldestKey = k; } }
+    if(oldestKey === null) break;
+    const oc = comps.get(oldestKey);
+    oc.comp.dispose && oc.comp.dispose();
+    comps.delete(oldestKey);
+  }
+  return c;
+}
+
+// ---- labels
+const overlay = document.createElement('canvas');
+const octx = overlay.getContext('2d', { willReadFrequently: true });
+wrap.appendChild(overlay);
+Object.assign(overlay.style, { position:'absolute', inset:'0', pointerEvents:'none' });
+function drawLabels(h){
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  octx.font = '9px Segoe UI, Arial';
+  rects.forEach((r,i)=>{
+    const y = r.y - scrollY;
+    if(y + r.h < 0 || y > h) return;
+    const it = items[i]; if(!it) return;
+    const cell = cellMap.get(keyOf(it));
+    const d = cell ? cell.desc : it;
+    octx.fillStyle = 'rgba(160,166,175,0.9)';
+    octx.fillText(`${d.accent} · ${d.hair}`, r.x+6, y+14);
+    octx.fillStyle = 'rgba(120,126,136,0.85)';
+    octx.fillText(`${d.fit} · seed ${it.seed}`, r.x+6, y+26);
+  });
+  if(scrollMax > 0){
+    const trackH = h - 20, tx = overlay.width - 7;
+    octx.fillStyle = 'rgba(70,74,82,0.5)'; octx.fillRect(tx, 10, 3, trackH);
+    const th = Math.max(30, trackH * (h / VH));
+    const ty = 10 + (trackH - th) * (scrollY / scrollMax);
+    octx.fillStyle = 'rgba(25,227,255,0.8)'; octx.fillRect(tx, ty, 3, th);
+  }
+}
+
+// ---- input
+wrap.addEventListener('wheel', e=>{
+  scrollY = Math.max(0, Math.min(scrollMax, scrollY + e.deltaY));
+  e.preventDefault();
+}, { passive:false });
+let dragScroll = null;
+const mouse = { x:-1, y:-1 };
+let hoverIdx = -1;
+renderer.domElement.addEventListener('pointerdown', e=>{
+  const r = renderer.domElement.getBoundingClientRect();
+  dragScroll = { y0: e.clientY, s0: scrollY, moved:false };
+});
+window.addEventListener('pointermove', e=>{
+  if(dragScroll){
+    const dy = e.clientY - dragScroll.y0;
+    if(Math.abs(dy) > 4) dragScroll.moved = true;
+    scrollY = Math.max(0, Math.min(scrollMax, dragScroll.s0 - dy));
+  }
+  const r = renderer.domElement.getBoundingClientRect();
+  mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+});
+window.addEventListener('pointerup', ()=>{
+  if(dragScroll && !dragScroll.moved && hoverIdx >= 0){
+    const it = items[hoverIdx];
+    location.href = `index.html?accent=${it.accent}&hair=${it.hair}&fit=${it.fit}&seed=${it.seed}&cape=1`;
+  }
+  dragScroll = null;
+});
+
+// ---- filter events
+['fAccent','fHair','fFit'].forEach(id => document.getElementById(id).addEventListener('change', applyFilter));
+document.getElementById('seedIn').addEventListener('input', applyFilter);
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  ['fAccent','fHair','fFit'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('seedIn').value='';
+  applyFilter();
+});
+document.getElementById('btnRoll').addEventListener('click', ()=>{
+  const c = ALL[Math.floor(Math.random()*ALL.length)];
+  document.getElementById('fAccent').value = c.accent;
+  document.getElementById('fHair').value = c.hair;
+  document.getElementById('fFit').value = c.fit;
+  document.getElementById('seedIn').value = '';
+  applyFilter();
+});
+document.getElementById('btnGallery').addEventListener('click', ()=> location.href='gallery.html');
+document.getElementById('btnSheet').addEventListener('click', ()=> location.href='index.html');
+
+// ---- animation loop
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  frameCount++;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  hoverIdx = -1;
+  rects.forEach((r,i)=>{
+    const y = r.y - scrollY;
+    if(mouse.x>=r.x && mouse.x<=r.x+r.w && mouse.y>=y && mouse.y<=y+r.h) hoverIdx=i;
+  });
+
+  renderer.setScissorTest(false);
+  renderer.setClearColor(0x1f2023,1);
+  renderer.clear();
+  renderer.setScissorTest(true);
+  rects.forEach((r,i)=>{
+    const yTop = r.y - scrollY;
+    if(yTop + r.h < 0 || yTop > h) return;
+    const it = items[i]; if(!it) return;
+    const cell = acquireCell(it);           // lazy-acquire as rows scroll in
+    if(!cell.rig.root.visible){ cell.rig.root.visible = cell.ped.visible = true; }
+    const vx = r.x, vy = h - yTop - r.h;
+    renderer.setViewport(vx, vy, r.w, r.h);
+    renderer.setScissor(vx, vy, r.w, r.h);
+    cell.rig.tick(dt);
+    const t = clock.elapsedTime + it.seed;
+    let yaw = Math.sin(t*0.3)*0.12;
+    if(i===hoverIdx) yaw = t*0.9;
+    cell.rig.root.rotation.y = yaw;
+    cell.rig.root.position.y = (i===hoverIdx) ? 1.5 : 0;
+    const c = ensureComposer(i, r.w, r.h);
+    const zoom = (i===hoverIdx) ? 0.92 : 1.0;
+    c.cam.position.set(40*zoom, 33*zoom, 78*zoom);
+    c.cam.lookAt(0, 17.8, 0);
+    c.comp.render();
+  });
+  renderer.setScissorTest(false);
+  drawLabels(h);
+}
+
+// deep links INTO search: ?accent=&hair=&fit=&seed= pre-fill the filters
+(function initFromURL(){
+  const q = new URLSearchParams(location.search);
+  for (const [param, id] of [['accent','fAccent'],['hair','fHair'],['fit','fFit'],['seed','seedIn']]) {
+    const v = q.get(param);
+    if (v !== null && v !== '') document.getElementById(id).value = v;
+  }
+})();
+
+window.addEventListener('resize', layout);
+applyFilter();
+animate();
+document.getElementById('loader').classList.add('hide');
+</script>
+</body>
+</html>
