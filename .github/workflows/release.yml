@@ -48,6 +48,8 @@ jobs:
           npm run trailer
           npm run heritage
           node tools/export-mcpack.js pack-heritage --out VOXEL-NEON-HERITAGE.mcpack
+          npm run aurora
+          node tools/export-mcpack.js pack-aurora --out VOXEL-AURORA-CIRCUIT.mcpack
         env:
           CI: 'true'
 
@@ -63,6 +65,7 @@ jobs:
           cp dist/VOXEL-CYBER-STREET.mcpack release/
           cp dist/VOXEL-CYBER-STREET-STARTER.mcpack release/
           cp dist/VOXEL-NEON-HERITAGE.mcpack release/
+          cp dist/VOXEL-AURORA-CIRCUIT.mcpack release/
           cp dist/voxel-cyber-street-fabric-1.21.jar release/
           cp dist/voxel-cyber-street-fabric-src.zip release/
           cp dist/vcsdemo-neon-district.zip release/
@@ -70,7 +73,7 @@ jobs:
           cp voxel-cyber-street-trailer.webm release/
           cp trailer/*.mp4 release/
           zip -r release/voxel-cyber-street-presskit.zip \
-            cover poster icons langqa.html store-listing.html \
+            cover poster icons langqa.html store-listing.html dual-store.html aurora.html \
             cover-letter.html compliance.html
           ls -la release/
 

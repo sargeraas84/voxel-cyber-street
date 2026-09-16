@@ -2,7 +2,7 @@ plugins {
     id 'fabric-loom' version '1.7.4'
     id 'java'
 }
-version = '2.1.0'
+version = '2.2.0'
 group = 'com.voxelcyberstreet'
 base { archivesName = 'voxel-cyber-street-fabric' }
 repositories { mavenCentral(); maven { url = 'https://maven.fabricmc.net' } }

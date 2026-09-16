@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "voxelcyberstreet",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "name": "VOXEL CYBER-STREET",
   "description": "Cyber-street skin pack applied to NPCs: zombie villager conversions (\"Corrupted Skins\") with glowing tech capes, plus a player-entity skin hook for NPC platforms.",
   "authors": [

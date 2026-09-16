@@ -31,6 +31,17 @@ store tooling. Format follows [Keep a Changelog](https://keepachangelog.com/en/1
 - `dist/voxel-cyber-street-gameplay-demo-tour.mp4` — 2:00 real-time 1440p capture
   (2399 frames) of the in-game tour route.
 
+## [2.2.0] — 2026-09-16
+
+### Collection expansion
+- Added **AURORA CIRCUIT**, a third 36-skin themed line with polar, mint,
+  violet and comet accents, expedition-tech fits, its own seed range, gallery,
+  four-language Bedrock metadata, and a spec-validated `.mcpack`.
+- Added `dual-store.html`, a Marketplace-style cross-sell page for CYBER-STREET
+  and NEON HERITAGE with a complete 72-skin bundle pricing plan.
+- Release automation now builds and publishes all three full packs plus the
+  dual-pack store asset.
+
 ## [2.1.0] — 2026-09-16
 
 ### Fabric mod

@@ -13,6 +13,8 @@ A full-body 3D voxel character design of a stylish teenager in the Minecraft sty
 | `index.html` | Reference sheet: 4 viewports, real UnrealBloom neon, idle/walk/wave/dance animations, toggleable glowing tech cape |
 | `gallery.html` | 36-skin pack gallery — scrollable 4-column grid of live 3D characters with bloom |
 | `heritage.html` | Pack #2 gallery: NEON HERITAGE — same rig, ember/jade/brass palette, haori/mandarin/obi fits (`npm run heritage` regenerates) |
+| `aurora.html` | Pack #3 gallery: AURORA CIRCUIT — polar light, holographic trims and expedition-tech fits (`npm run aurora` regenerates) |
+| `dual-store.html` | Marketplace-style dual-pack cross-sell page with individual and 72-skin bundle planning prices |
 | `cover.html` | Live Marketplace cover compositor (2048×1152) |
 | `cover/voxel-cyber-street-cover-2048x1152.png` | Rendered cover image (also via `npm run cover`) |
 | `skin-gen-core.js` | Shared procedural painter, theme-aware: Neon Street (pink/cyan) + Neon Heritage (ember/jade/brass) tables, seed-stable |
@@ -27,9 +29,10 @@ A full-body 3D voxel character design of a stylish teenager in the Minecraft sty
 | `tools/render-icons.js` | CLI: 36× 512×512 store portrait icons + contact sheet |
 | `tools/render-poster.js` | CLI: A3 (3508×4961 @ 300dpi) trading-card poster, 3×2 stat cards |
 | `tools/build-fabric-mod.js` | CLI: Java Edition Fabric mod — applies skins + capes to NPCs |
-| `tools/validate-packs.js` | CLI: re-validate all dist `.mcpack`s against the Microsoft spec (core, starter, heritage) |
+| `tools/validate-packs.js` | CLI: re-validate all dist `.mcpack`s against the Microsoft spec (core, starter, heritage, aurora) |
 | `trailer-capture.js` | Gallery trailer mode: records `gallery.html?trailer=1` to webm |
 | `TRAILER.md` | Shot list, VO script, OBS recording guide |
+| `voxel-cyber-street-gameplay-demo-{race,chase,crowd}.mp4` | Real in-game Neon District captures from the Voxel Director, encoded at 20 fps / 1440p |
 | `cyber-teen-skin.png` | Latest generated single skin |
 | `dist/VOXEL-CYBER-STREET.mcpack` | Installable Bedrock skin pack (36 skins) |
 | `icons/` | Store icons: `icon-01..36.png` (512²) + `contact-sheet.png` |

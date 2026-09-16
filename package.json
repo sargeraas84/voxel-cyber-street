@@ -1,6 +1,6 @@
 {
   "name": "voxel-cyber-teen",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Minecraft-style cyberpunk teen — 36-skin procedural pack, 3D reference sheet with bloom, Bedrock .mcpack, Fabric mod, store icons, A3 poster, trailer capture",
   "scripts": {
@@ -24,6 +24,7 @@
     "datapack": "node tools/build-datapack.js",
     "starter": "node tools/build-starter-pack.js",
     "heritage": "node tools/build-pack.js pack-heritage --theme heritage",
+    "aurora": "node tools/build-pack.js pack-aurora --theme aurora",
     "serve": "node tools/serve.js 8321",
     "validate": "node tools/validate-packs.js",
     "trailer": "node tools/build-pack.js && node tools/export-mcpack.js && node tools/sync-fabric-resources.js && node tools/gen-egg-texture.js && node tools/build-fabric-mod.js && bash tools/compile-fabric-mod.sh build && node tools/render-cover.js && node tools/render-icons.js && node tools/render-poster.js && node tools/build-starter-pack.js && node tools/build-langqa.js && node tools/build-datapack.js && node tools/record-trailer.js && node tools/export-trailer-formats.js && node tools/build-store-listing.js && node tools/build-cover-letter.js && node tools/build-compliance.js && node tools/build-submission-bundle.js"

@@ -74,9 +74,38 @@ const HAIRS_HERITAGE = {
 
 const FITS_HERITAGE = ['haori-wrap', 'mandarin-jacket', 'silk-hood', 'obi-bomber', 'dragon-ma1', 'qipao-hood'];
 
+// PACK #3 — AURORA CIRCUIT: arctic light, holographic trims and expedition tech.
+const ACCENTS_AURORA = {
+  'aurora-mint': { a:'#41f5c4', b:'#b8ff5a', aLo:'#168c72', bLo:'#6b9c24' },
+  'polar-blue': { a:'#45b7ff', b:'#d7f4ff', aLo:'#1f679c', bLo:'#7fa8b8' },
+  'violet-ice': { a:'#9b6cff', b:'#63e6ff', aLo:'#57329c', bLo:'#258ca0' },
+  'glacier-rose': { a:'#78d7ff', b:'#ff78c8', aLo:'#397f9c', bLo:'#a03d7c' },
+  'solar-lime': { a:'#d8ff48', b:'#5effd3', aLo:'#829c20', bLo:'#249c7b' },
+  'deep-space': { a:'#526cff', b:'#b18cff', aLo:'#293b9c', bLo:'#633e9c' },
+  'frost-orange': { a:'#b9f5ff', b:'#ff9b4a', aLo:'#6d9ca8', bLo:'#a05a22' },
+  'nebula-pink': { a:'#ff64d4', b:'#8c7bff', aLo:'#a02e82', bLo:'#4d409c' },
+  'comet-gold': { a:'#ffe16b', b:'#75d9ff', aLo:'#9c8128', bLo:'#397f9c' },
+  'glow-lilac': { a:'#d696ff', b:'#73ffc8', aLo:'#814d9c', bLo:'#319c78' },
+};
+const HAIRS_AURORA = {
+  'polar-white': { light:'#ffffff', mid:'#d9f5ff', dark:'#9ec8dc', shade:'#668b9d' },
+  'holo-silver': { light:'#f4f2ff', mid:'#c6c2dc', dark:'#8885aa', shade:'#504e70' },
+  'arctic-blue': { light:'#d8f7ff', mid:'#8ed9ef', dark:'#4d9eb8', shade:'#286276' },
+  'lavender-fade': { light:'#f6eaff', mid:'#d1a9ef', dark:'#9363b8', shade:'#593477' },
+  'mint-shadow': { light:'#e5fff8', mid:'#9de0cb', dark:'#4c9e87', shade:'#28604f' },
+  'solar-blonde': { light:'#fff8cf', mid:'#e9d877', dark:'#b29d3f', shade:'#6e5e20' },
+};
+const FITS_AURORA = ['puffer-shell', 'orbit-coat', 'holo-hood', 'utility-vest', 'thermal-cape', 'signal-bomber'];
+
 // silhouette behaviors are keyed by fit; thematic fits alias to the core
 // behavior set so heritage garments keep hoods, drape and hem treatments
 const FIT_ALIASES = {
+  'puffer-shell':    'bomber',
+  'orbit-coat':      'longline',
+  'holo-hood':       'tech-hood',
+  'utility-vest':    'vest-hood',
+  'thermal-cape':    'longline',
+  'signal-bomber':   'bomber-hood',
   'haori-wrap':      'longline',
   'mandarin-jacket': 'bomber',
   'silk-hood':       'tech-hood',
@@ -90,6 +119,7 @@ const FIT_ALIASES = {
 const THEMES = {
   core:     { accents: ACCENTS,          hairs: HAIRS,          fits: FITS,          label: 'Neon Street',   packId: 'VOXEL // CYBER-STREET',  seedBase: 2000 },
   heritage: { accents: ACCENTS_HERITAGE, hairs: HAIRS_HERITAGE, fits: FITS_HERITAGE, label: 'Neon Heritage', packId: 'VOXEL // NEON HERITAGE', seedBase: 5000 },
+  aurora:   { accents: ACCENTS_AURORA, hairs: HAIRS_AURORA, fits: FITS_AURORA, label: 'Aurora Circuit', packId: 'VOXEL // AURORA CIRCUIT', seedBase: 8000 },
 };
 
 function mulberry32(seed){
@@ -468,6 +498,6 @@ function createSkin(opts, env){
   return { canvas:skin, glowCanvas:glow, capeCanvas, capeGlowCanvas:capeGlow, desc:{ accent:accentKey, hair:hairKey, fit:fitKey, seed, cape:!!opts.cape } };
 }
 
-root.SkinGenCore = { PAL, ACCENTS, HAIRS, FITS, ACCENTS_HERITAGE, HAIRS_HERITAGE, FITS_HERITAGE, THEMES, FIT_ALIASES, UV, createSkin, mulberry32 };
+root.SkinGenCore = { PAL, ACCENTS, HAIRS, FITS, ACCENTS_HERITAGE, HAIRS_HERITAGE, FITS_HERITAGE, ACCENTS_AURORA, HAIRS_AURORA, FITS_AURORA, THEMES, FIT_ALIASES, UV, createSkin, mulberry32 };
 if (typeof module !== 'undefined' && module.exports) module.exports = root.SkinGenCore;
 })(typeof window !== 'undefined' ? window : globalThis);

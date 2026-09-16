@@ -82,6 +82,29 @@ const HERITAGE_HAIR_NAMES = {
   'espresso':  { en_US: 'espresso',   de_DE: 'espresso',      fr_FR: 'espresso',      ja_JP: 'エスプレッソ' },
 };
 
+const AURORA_TITLES = {
+  en_US: 'VOXEL AURORA CIRCUIT Pack', de_DE: 'VOXEL AURORA CIRCUIT Paket',
+  fr_FR: 'Pack VOXEL AURORA CIRCUIT', ja_JP: 'VOXEL AURORA CIRCUIT パック',
+};
+const AURORA_ACCENT_NAMES = {
+  'aurora-mint': {en_US:'aurora / mint',de_DE:'Aurora / Mint',fr_FR:'aurore / menthe',ja_JP:'オーロラ×ミント'},
+  'polar-blue': {en_US:'polar / blue',de_DE:'Polar / Blau',fr_FR:'polaire / bleu',ja_JP:'ポーラー×ブルー'},
+  'violet-ice': {en_US:'violet / ice',de_DE:'Violett / Eis',fr_FR:'violet / glace',ja_JP:'バイオレット×アイス'},
+  'glacier-rose': {en_US:'glacier / rose',de_DE:'Gletscher / Rose',fr_FR:'glacier / rose',ja_JP:'氷河×ローズ'},
+  'solar-lime': {en_US:'solar / lime',de_DE:'Solar / Limette',fr_FR:'solaire / lime',ja_JP:'ソーラー×ライム'},
+  'deep-space': {en_US:'deep space / violet',de_DE:'Weltraum / Violett',fr_FR:'espace / violet',ja_JP:'ディープスペース×紫'},
+  'frost-orange': {en_US:'frost / orange',de_DE:'Frost / Orange',fr_FR:'givre / orange',ja_JP:'フロスト×オレンジ'},
+  'nebula-pink': {en_US:'nebula / pink',de_DE:'Nebel / Pink',fr_FR:'nébuleuse / rose',ja_JP:'星雲×ピンク'},
+  'comet-gold': {en_US:'comet / gold',de_DE:'Komet / Gold',fr_FR:'comète / or',ja_JP:'彗星×ゴールド'},
+  'glow-lilac': {en_US:'glow / lilac',de_DE:'Glow / Flieder',fr_FR:'lueur / lilas',ja_JP:'グロー×ライラック'},
+};
+const AURORA_HAIR_NAMES = {
+  'polar-white':{en_US:'polar white',de_DE:'Polarweiß',fr_FR:'blanc polaire',ja_JP:'ポーラーホワイト'},'holo-silver':{en_US:'holo silver',de_DE:'Holo-Silber',fr_FR:'argent holo',ja_JP:'ホロシルバー'},'arctic-blue':{en_US:'arctic blue',de_DE:'Arktisblau',fr_FR:'bleu arctique',ja_JP:'アークティックブルー'},'lavender-fade':{en_US:'lavender fade',de_DE:'Lavendel-Fade',fr_FR:'dégradé lavande',ja_JP:'ラベンダーフェード'},'mint-shadow':{en_US:'mint shadow',de_DE:'Mint-Schatten',fr_FR:'ombre menthe',ja_JP:'ミントシャドウ'},'solar-blonde':{en_US:'solar blonde',de_DE:'Solarblond',fr_FR:'blond solaire',ja_JP:'ソーラーブロンド'}
+};
+const AURORA_FIT_NAMES = {
+  'puffer-shell':{en_US:'puffer shell',de_DE:'Puffer-Shell',fr_FR:'doudoune shell',ja_JP:'パファーシェル'},'orbit-coat':{en_US:'orbit coat',de_DE:'Orbit-Mantel',fr_FR:'manteau orbital',ja_JP:'オービットコート'},'holo-hood':{en_US:'holo hood',de_DE:'Holo-Kapuze',fr_FR:'capuche holo',ja_JP:'ホロフード'},'utility-vest':{en_US:'utility vest',de_DE:'Utility-Weste',fr_FR:'gilet utilitaire',ja_JP:'ユーティリティベスト'},'thermal-cape':{en_US:'thermal cape',de_DE:'Thermo-Cape',fr_FR:'cape thermique',ja_JP:'サーマルケープ'},'signal-bomber':{en_US:'signal bomber',de_DE:'Signal-Bomber',fr_FR:'bomber signal',ja_JP:'シグナルブルゾン'}
+};
+
 const HERITAGE_FIT_NAMES = {
   'haori-wrap':     { en_US: 'haori wrap',      de_DE: 'Haori-Mantel',      fr_FR: 'haori drapé',      ja_JP: '羽織ラップ' },
   'mandarin-jacket':{ en_US: 'mandarin jacket', de_DE: 'Mandarinenjacke',   fr_FR: 'veste mandarine',  ja_JP: 'マンダリンジャケット' },
@@ -95,9 +118,9 @@ const maskName = k => (ACCENT_NAMES[k] && ACCENT_NAMES[k].en_US) || k;
 
 /** Localized display name for one skin (theme-aware). */
 function skinTitle(lang, desc) {
-  const acc = ((HERITAGE_ACCENT_NAMES[desc.accent] || ACCENT_NAMES[desc.accent]) || {})[lang] || desc.accent;
-  const hair = ((HERITAGE_HAIR_NAMES[desc.hair] || HAIR_NAMES[desc.hair]) || {})[lang] || desc.hair;
-  const fit = ((HERITAGE_FIT_NAMES[desc.fit] || FIT_NAMES[desc.fit]) || {})[lang] || desc.fit;
+  const acc = ((AURORA_ACCENT_NAMES[desc.accent] || HERITAGE_ACCENT_NAMES[desc.accent] || ACCENT_NAMES[desc.accent]) || {})[lang] || desc.accent;
+  const hair = ((AURORA_HAIR_NAMES[desc.hair] || HERITAGE_HAIR_NAMES[desc.hair] || HAIR_NAMES[desc.hair]) || {})[lang] || desc.hair;
+  const fit = ((AURORA_FIT_NAMES[desc.fit] || HERITAGE_FIT_NAMES[desc.fit] || FIT_NAMES[desc.fit]) || {})[lang] || desc.fit;
   if (lang === 'ja_JP') return `${acc}／${hair}／${fit}`;
   if (lang === 'de_DE') return `${acc} — ${hair}, ${fit}`;
   return `${acc} · ${hair} · ${fit}`;
@@ -120,4 +143,4 @@ function buildLangs({ locName, packTitles, skins }) {
   return out;
 }
 
-module.exports = { PACK_TITLES, STARTER_TITLES, HERITAGE_TITLES, ACCENT_NAMES, HAIR_NAMES, FIT_NAMES, HERITAGE_ACCENT_NAMES, HERITAGE_HAIR_NAMES, HERITAGE_FIT_NAMES, skinTitle, buildLangs };
+module.exports = { PACK_TITLES, STARTER_TITLES, HERITAGE_TITLES, AURORA_TITLES, ACCENT_NAMES, HAIR_NAMES, FIT_NAMES, HERITAGE_ACCENT_NAMES, HERITAGE_HAIR_NAMES, HERITAGE_FIT_NAMES, skinTitle, buildLangs };

@@ -16,7 +16,7 @@ const fs = require('fs');
 const zlib = require('zlib');
 const { createCanvas, loadImage } = require('canvas');
 const { exportValidMcpack } = require('./lib/mcpack-spec');
-const { buildLangs, PACK_TITLES, HERITAGE_TITLES } = require('./lib/mcpack-i18n');
+const { buildLangs, PACK_TITLES, HERITAGE_TITLES, AURORA_TITLES } = require('./lib/mcpack-i18n');
 
 const root = path.resolve(__dirname, '..');
 const packDir = path.resolve(root, process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'pack');
@@ -48,7 +48,7 @@ const headerUuid = uuid();
 const moduleUuid = uuid();
 
 // ---------------- collect skin files
-const LOC_NAME = 'VoxelCyberStreet';   // serialize_name + localization_name (no spaces)
+const LOC_NAME = manifest.theme === 'heritage' ? 'VoxelNeonHeritage' : manifest.theme === 'aurora' ? 'VoxelAuroraCircuit' : 'VoxelCyberStreet';   // serialize_name + localization_name (no spaces)
 const skins = manifest.skins.map(s => s.file);   // e.g. skins/skin-01-....png
 const skinNames = manifest.skins.map(s =>
   s.name.replace(/[^a-z0-9]+/gi, '_').toLowerCase());
@@ -73,8 +73,8 @@ const skinsJson = {
   })),
 };
 // ---------------- localization (en_US, de_DE, fr_FR, ja_JP — shared builder)
-const isHeritage = manifest.theme === 'heritage';
-const langBodies = buildLangs({ locName: LOC_NAME, packTitles: isHeritage ? HERITAGE_TITLES : PACK_TITLES, skins: skinsMeta });
+const packTitles = manifest.theme === 'heritage' ? HERITAGE_TITLES : manifest.theme === 'aurora' ? AURORA_TITLES : PACK_TITLES;
+const langBodies = buildLangs({ locName: LOC_NAME, packTitles, skins: skinsMeta });
 
 // ---------------- pack_icon.png (128x128 from skin #1, upscaled nearest)
 async function makeIcon() {

@@ -15,6 +15,7 @@ const PACKS = [
   { file: 'dist/VOXEL-CYBER-STREET.mcpack', locName: 'VoxelCyberStreet' },
   { file: 'dist/VOXEL-CYBER-STREET-STARTER.mcpack', locName: 'VoxelCyberStreetStarter' },
   { file: 'dist/VOXEL-NEON-HERITAGE.mcpack', locName: 'VoxelNeonHeritage' },
+  { file: 'dist/VOXEL-AURORA-CIRCUIT.mcpack', locName: 'VoxelAuroraCircuit' },
 ];
 
 let failed = false;
