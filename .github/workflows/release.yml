@@ -8,6 +8,12 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
+# The final release step creates the GitHub release and uploads artifacts;
+# without this the default GITHUB_TOKEN is read-only (403 "Resource not
+# accessible by integration") and the run fails after a fully green build.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest

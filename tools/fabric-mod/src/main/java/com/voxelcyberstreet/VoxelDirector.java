@@ -119,6 +119,13 @@ public final class VoxelDirector {
         ClientTickEvents.END_CLIENT_TICK.register(VoxelDirector::tick);
     }
 
+    /** Autopilot entry point (headless quick-play capture): no chat spam, HUD forced off. */
+    public static void autopilotStart(String routeKey) {
+        if (!start(routeKey, true)) {
+            VoxelAutopilot.onDirectorStop(); // make sure the run fails fast and loudly
+        }
+    }
+
     private static boolean start(String routeKey, boolean hud) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null) return false;
@@ -144,6 +151,7 @@ public final class VoxelDirector {
         if (client.player != null) client.player.getAbilities().flying = false;
         client.inGameHud.getChatHud().addMessage(Text.translatable("voxelcyberstreet." + reasonKey,
                 Text.literal("path complete"), shotCount));
+        VoxelAutopilot.onDirectorStop();   // no-op unless the autopilot is armed
     }
 
     private static void tick(MinecraftClient client) {

@@ -15,6 +15,20 @@ dependencies {
 }
 java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
 
+// Unattended capture boot:
+//   gradle runClient -Pvcs.quickPlay=NeonDistrict -Pvcs.route=tour
+// → vanilla --quickPlaySingleplayer (no UI) + VoxelAutopilot JVM flag
+tasks.named('runClient', JavaExec) {
+    doFirst {
+        if (project.hasProperty('vcs.quickPlay')) {
+            def route = (project.findProperty('vcs.route') ?: 'tour').toString()
+            args "--quickPlaySingleplayer=${project.property('vcs.quickPlay')}"
+            jvmArgs "-Dvoxelcyberstreet.autopilot=${route}"
+            println "[VCS] autopilot armed: world='${project.property('vcs.quickPlay')}' route='${route}'"
+        }
+    }
+}
+
 tasks.register('printMcJar') {
     doLast {
         configurations.compileClasspath.files.each { f ->

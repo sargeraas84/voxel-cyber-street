@@ -14,7 +14,8 @@
       "com.voxelcyberstreet.VoxelCyberStreet"
     ],
     "client": [
-      "com.voxelcyberstreet.VoxelCyberStreetClient"
+      "com.voxelcyberstreet.VoxelCyberStreetClient",
+      "com.voxelcyberstreet.VoxelAutopilot"
     ]
   },
   "mixins": [
